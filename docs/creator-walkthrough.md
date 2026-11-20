@@ -1,21 +1,12 @@
-# MeritSeal · Private grant eligibility receipts
+# MeritSeal reviewer walkthrough
 
-Grant reviewers need a way to share the outcome of an eligibility check without sharing the underlying application. MeritSeal's public workspace shows that workflow with [NLnet’s published €5,000–€50,000 range](https://nlnet.nl/propose/) for first grant requests.
+MeritSeal lets grant reviewers share an amount-check result while keeping the amount on their device. The app uses [NLnet’s published €5,000–€50,000 first-grant range](https://nlnet.nl/propose/). The check covers one criterion.
 
-## Walkthrough
+1. Open the [live checker](https://meritseal.vercel.app/#review). Try €12,000 and €55,000 for both outcomes.
+2. Select **Open receipt** or copy the link into a separate browser. Read the rule, result, date, and checksum status.
+3. Change one decision in the receipt checker while keeping the original checksum. Confirm the mismatch.
+4. Open the [proof section](https://meritseal.vercel.app/#proof) and [finalized Volta testnet transaction](https://zkverify-testnet.subscan.io/extrinsic/0xc480960248cd345a95f6b2b862d397445b475ed7a2c4149f54e12320bd5f29ea). The Groth16 proof covers a committed synthetic amount and uses a development proving setup. It is separate from newly generated checksum receipts.
 
-1. Open [MeritSeal](https://meritseal.vercel.app/#review). Run the €12,000 example and show the eligible result.
-2. Copy the receipt into the checker. It contains a policy ID, decision, issuance time, and SHA-256 checksum. The amount stays in the browser.
-3. Change the decision from Within range to Outside range in the checker while leaving the checksum intact. The check should fail.
-4. Run the €55,000 example and show that the policy rejects it.
-5. Explain the verification boundary. A checksum detects edits relative to the original checksum. Anyone can compute a replacement. The live receipt has no issuer signature or zero-knowledge proof.
+The browser and signed callback use the same amount rule. The callback passed local signed tests. Live Agent Games preflight and practice remain unconfirmed.
 
-## Architecture
-
-The public workspace evaluates the published amount rule in the browser. Separately, the HTTPS agent handles signed Agent Games requests and evaluates explicit policy rules. The workspace does not call the private agent endpoint. The signed callback and browser flow serve different audiences.
-
-A future proof would bind the policy version, cap, outcome, and a commitment to the hidden amount. An independent verifier could then check whether the committed amount satisfies the cap. Include a network verification reference only once a real proof has been verified.
-
-## Recording outline
-
-Spend 15 seconds on the reviewer problem, 30 seconds running both outcomes, 20 seconds showing the receipt and edit check, and 15 seconds explaining what an independent proof would add.
+[Read the circuit and test results](../proof/README.md).

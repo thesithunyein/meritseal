@@ -8,6 +8,10 @@
   <a href="./docs/creator-walkthrough.md"><img src="https://img.shields.io/badge/Read-Technical%20walkthrough-475569" alt="Read the technical walkthrough"></a>
 </p>
 
+[![MeritSeal landing page with the original animated seal illustration](./docs/meritseal-home.png)](https://meritseal.vercel.app/)
+
+[Try the live checker](https://meritseal.vercel.app/#review) · [View the proof](https://meritseal.vercel.app/#proof) · [Open the finalized transaction](https://zkverify-testnet.subscan.io/extrinsic/0xc480960248cd345a95f6b2b862d397445b475ed7a2c4149f54e12320bd5f29ea)
+
 ## Problem
 
 Grant reviewers need to explain eligibility decisions without sharing private application details. MeritSeal applies a versioned rule in the browser and issues a receipt with the policy ID, outcome, timestamp, and SHA-256 checksum. The requested amount stays on the device.
@@ -16,12 +20,12 @@ Grant reviewers need to explain eligibility decisions without sharing private ap
 
 [NLnet’s application form](https://nlnet.nl/propose/) sets a €5,000–€50,000 range for first grant requests. MeritSeal tracks this one amount check as `nlnet-first-grant-amount:v1`. A reviewer can share the result without disclosing the budget. NLnet determines overall eligibility and funding.
 
-## Try it in under a minute
+## Review in under a minute
 
-1. Open the [live eligibility checker](https://meritseal.vercel.app/#review). Try **€12,000** to pass the published range.
-2. Click **Use generated receipt**, then **Check checksum**. Expect **Checksum matches**.
-3. Change `Within range` to `Outside range` in the checker while keeping the checksum unchanged. Check again and expect a mismatch.
-4. Try **€55,000** to see a request fail the same rule.
+1. Open the [live checker](https://meritseal.vercel.app/#review) and select **Try €12,000**. Expect **Within range**.
+2. Select **Open receipt** or copy its link into another browser. The recipient sees the rule, result, date, and checksum status. The requested amount is omitted. Raw JSON is under **Technical details**.
+3. Back in the checker, change `Within range` to `Outside range` in the receipt JSON and select **Check checksum**. Expect a mismatch if the original checksum is unchanged.
+4. Try **€55,000** for **Outside range**. Select **Save receipt** to find it again under [Recent checks](https://meritseal.vercel.app/#history). History stays in the current browser.
 
 ## How it works
 
@@ -30,12 +34,12 @@ flowchart LR
     subgraph Browser["Applicant data stays in the browser"]
         Amount["Requested amount"] --> Rule["Versioned eligibility rule"]
         Rule --> Decision{"Within €5,000–€50,000?"}
-        Decision -->|Yes| Pass["Eligible"]
-        Decision -->|No| Reject["Ineligible"]
+        Decision -->|Yes| Pass["Within range"]
+        Decision -->|No| Reject["Outside range"]
         Pass --> Receipt["Receipt fields + SHA-256"]
         Reject --> Receipt
     end
-    Receipt -->|"Share JSON"| Checker["Recipient recalculates checksum"]
+    Receipt -->|"Copy receipt link"| Checker["Recipient reads result and recalculates checksum"]
     Checker --> Result["Match or mismatch"]
 ```
 
@@ -43,7 +47,7 @@ The checksum detects edits when compared against the original checksum. Anyone c
 
 ## Agent service
 
-The browser checker and signed Agent Games callback use the same NLnet amount evaluator. The callback accepts `input.policy_id` set to `nlnet-first-grant-amount:v1` and an integer `input.amount_eur`. It validates signed requests and evaluates explicit policy rules deterministically. Production signed preflight and practice have not been confirmed.
+The browser checker and signed Agent Games callback use the same NLnet amount evaluator. The callback accepts `input.policy_id` set to `nlnet-first-grant-amount:v1` and an integer `input.amount_eur`. It validates signed requests and evaluates explicit policy rules deterministically. Signed decisions and response HMACs were tested locally. Production Agent Games preflight and practice remain unconfirmed.
 
 | Method | Route | Purpose |
 | --- | --- | --- |
@@ -69,4 +73,4 @@ Open `http://localhost:3000/`. For signed callback testing, set `AGENT_GAMES_HMA
 
 ## Finalized testnet example
 
-[View zkVerify Volta transaction](https://zkverify-testnet.subscan.io/extrinsic/0xc480960248cd345a95f6b2b862d397445b475ed7a2c4149f54e12320bd5f29ea). Kurier reported `Finalized`. This synthetic example uses a development Groth16 setup. The transaction applies to the sample only. Browser-generated receipts still use checksums.
+[View zkVerify Volta transaction](https://zkverify-testnet.subscan.io/extrinsic/0xc480960248cd345a95f6b2b862d397445b475ed7a2c4149f54e12320bd5f29ea). Kurier reported `Finalized`. This synthetic example uses a development Groth16 setup. The proof covers one committed synthetic amount under policy v1. New browser receipts use checksums and carry neither an issuer signature nor a per-receipt proof.
