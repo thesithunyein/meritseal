@@ -21,4 +21,15 @@ Test that €5,000 and €50,000 pass, €4,999 and €50,001 fail, and changing
 
 Follow the [zkVerify quickstart](https://docs.zkverify.io/handbook/quickstart) with the Groth16 proof, verification key, and public signals. Kurier requires a testnet API key. The direct route requires a funded network account. Publish the finalized verification reference only after confirming it corresponds to this circuit and commitment.
 
-Status: circuit source and input helper only. No finalized network proof is referenced here.
+## Verified locally
+
+| Check | Result |
+| --- | --- |
+| €5,000 and €50,000 | Groth16 proofs verified |
+| €4,999 and €50,001 | Circuit rejected the witness |
+| Changed public commitment | Verification rejected both altered proofs |
+| Signed `POST /api/agent` on loopback | Correct decisions and valid response HMACs for all four inputs |
+
+Run `npm test` for the signed callback checks. For circuit regression checks, place the development zkey and exported verification key at `proof/build/dev.zkey` and `proof/build/dev.vkey.json`, then run `node proof/verify-boundaries.mjs`. Pass an alternate WASM path as the first argument if needed.
+
+These tests used a local development Groth16 setup and a test HMAC key. zkVerify finalization, the live proof link, and Agent Games production preflight are pending.
