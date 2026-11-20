@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: meritseal-agent
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: AGENT_GAMES_HMAC_SECRET
+        sync: false
+      - key: NODE_VERSION
+        value: 20
+
