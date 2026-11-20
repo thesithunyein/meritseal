@@ -32,4 +32,8 @@ Follow the [zkVerify quickstart](https://docs.zkverify.io/handbook/quickstart) w
 
 Run `npm test` for the signed callback checks. For circuit regression checks, place the development zkey and exported verification key at `proof/build/dev.zkey` and `proof/build/dev.vkey.json`, then run `node proof/verify-boundaries.mjs`. Pass an alternate WASM path as the first argument if needed.
 
-These tests used a local development Groth16 setup and a test HMAC key. zkVerify finalization, the live proof link, and Agent Games production preflight are pending.
+These tests used a local development Groth16 setup and a test HMAC key. Agent Games production preflight remains pending.
+
+## Finalized testnet example
+
+[View zkVerify Volta transaction](https://zkverify-testnet.subscan.io/extrinsic/0xc480960248cd345a95f6b2b862d397445b475ed7a2c4149f54e12320bd5f29ea). Kurier reported `Finalized`. This synthetic example uses a development Groth16 setup. The transaction applies to the sample only. Browser-generated receipts still use checksums.
