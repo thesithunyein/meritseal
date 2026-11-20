@@ -39,7 +39,7 @@ flowchart LR
     Checker --> Result["Match or mismatch"]
 ```
 
-The checksum detects edits when compared against the original checksum. Anyone can recompute it, so it does not authenticate the issuer or independently prove that the rule was applied correctly. Independent zkVerify verification is future work.
+The checksum detects edits when compared against the original checksum. Anyone can recompute it, so it does not authenticate the issuer or independently prove that the rule was applied correctly. The [NLnet proof circuit and verification workflow](./proof/README.md) are in development. The live receipt uses a checksum and has no finalized zkVerify reference.
 
 ## Agent service
 
