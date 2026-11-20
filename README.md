@@ -39,7 +39,7 @@ flowchart LR
     Checker --> Result["Match or mismatch"]
 ```
 
-The checksum detects edits when compared against the original checksum. Anyone can recompute it, so it does not authenticate the issuer or independently prove that the rule was applied correctly. The [NLnet proof circuit and verification workflow](./proof/README.md) are in development. The live receipt uses a checksum and has no finalized zkVerify reference.
+The checksum detects edits when compared against the original checksum. Anyone can recompute it, so it does not authenticate the issuer or independently prove that the rule was applied correctly. The [NLnet proof circuit and verification workflow](./proof/README.md) are in development. The live receipt uses a checksum. A separate synthetic testnet proof is linked below.
 
 ## Agent service
 
@@ -66,3 +66,7 @@ Open `http://localhost:3000/`. For signed callback testing, set `AGENT_GAMES_HMA
 ## Project policies
 
 [MIT license](./LICENSE) · [Security policy](./SECURITY.md) · [Code of conduct](./CODE_OF_CONDUCT.md)
+
+## Finalized testnet example
+
+[View zkVerify Volta transaction](https://zkverify-testnet.subscan.io/extrinsic/0xc480960248cd345a95f6b2b862d397445b475ed7a2c4149f54e12320bd5f29ea). Kurier reported `Finalized`. This synthetic example uses a development Groth16 setup. The transaction applies to the sample only. Browser-generated receipts still use checksums.
