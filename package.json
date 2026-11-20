@@ -1,0 +1,2 @@
+{"name":"meritseal-agent","version":"0.1.0","private":true,"type":"module","scripts":{"start":"node agent/server.mjs","test":"node --test agent/server.test.mjs"},"engines":{"node":">=20"}}
+
