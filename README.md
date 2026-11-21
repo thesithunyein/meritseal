@@ -1,76 +1,86 @@
 <p align="center"><img src="./docs/meritseal-shield.svg" width="82" height="82" alt="MeritSeal shield"></p>
 
 <h1 align="center">MeritSeal</h1>
-<p align="center">Private grant eligibility receipts</p>
+<p align="center">Zero-knowledge grant receipts: prove a funding request follows the rule without revealing the budget.</p>
 
 <p align="center">
-  <a href="https://meritseal.vercel.app/#review"><img src="https://img.shields.io/badge/Live-Eligibility%20checker-283A8C" alt="Live eligibility checker"></a>
-  <a href="./docs/creator-walkthrough.md"><img src="https://img.shields.io/badge/Read-Technical%20walkthrough-475569" alt="Read the technical walkthrough"></a>
+  <a href="https://meritseal.vercel.app/#zk"><img src="https://img.shields.io/badge/Live-Create%20a%20ZK%20receipt-283A8C" alt="Create a ZK receipt"></a>
+  <a href="./docs/creator-walkthrough.md"><img src="https://img.shields.io/badge/Read-Technical%20walkthrough-475569" alt="Technical walkthrough"></a>
 </p>
 
-[![MeritSeal landing page with the original animated seal illustration](./docs/meritseal-home.png)](https://meritseal.vercel.app/)
+[![MeritSeal landing page](./docs/meritseal-home.png)](https://meritseal.vercel.app/)
 
-[Try the live checker](https://meritseal.vercel.app/#review) · [View the proof](https://meritseal.vercel.app/#proof) · [Open the finalized transaction](https://zkverify-testnet.subscan.io/extrinsic/0xc480960248cd345a95f6b2b862d397445b475ed7a2c4149f54e12320bd5f29ea)
+## The problem
 
-## Problem
+Grant programs (foundations, DAOs, public-goods funds) are asked to show that every request and award follows their published rules. The obvious way to show that is to publish each budget, but grantees often can't do that: budgets reveal salaries, rates and runway. Today programs pick one side: they publish everything, or they ask the public to trust them.
 
-Grant reviewers need to explain eligibility decisions without sharing private application details. MeritSeal applies a versioned rule in the browser and issues a receipt with the policy ID, outcome, timestamp, and SHA-256 checksum. The requested amount stays on the device.
+MeritSeal lets an applicant **prove** a rule holds without disclosing the number. The first rule is NLnet's published first-grant range: the requested amount must be €5,000–€50,000 ([NLnet application form](https://nlnet.nl/propose/)).
 
-## Published rule
+**Who it helps:**
+- **Applicants** prove their request is in range to a screening agent or a public reviewer without revealing their budget.
+- **Grant programs and auditors** check a whole round's receipts and confirm each one is in policy, without seeing any amounts.
 
-[NLnet’s application form](https://nlnet.nl/propose/) sets a €5,000–€50,000 range for first grant requests. MeritSeal tracks this one amount check as `nlnet-first-grant-amount:v1`. A reviewer can share the result without disclosing the budget. NLnet determines overall eligibility and funding.
+## Try it in under a minute
 
-## Review in under a minute
-
-1. Open the [live checker](https://meritseal.vercel.app/#review) and select **Try €12,000**. Expect **Within range**.
-2. Select **Open receipt** or copy its link into another browser. The recipient sees the rule, result, date, and checksum status. The requested amount is omitted. Raw JSON is under **Technical details**.
-3. Back in the checker, change `Within range` to `Outside range` in the receipt JSON and select **Check checksum**. Expect a mismatch if the original checksum is unchanged.
-4. Try **€55,000** for **Outside range**. Select **Save receipt** to find it again under [Recent checks](https://meritseal.vercel.app/#history). History stays in the current browser.
+1. Open **[meritseal.vercel.app/#zk](https://meritseal.vercel.app/#zk)** and select **Try €12,000**. Your browser generates a Groth16 proof (a few seconds). The amount is never sent anywhere.
+2. The receipt shows the policy, a Poseidon commitment and the proof, then the zkVerify status as the proof is verified on-chain (Queued → … → Finalized, with a Subscan link).
+3. Select **Copy receipt link** and open it in another browser. The proof is verified there against the published key, and the amount appears nowhere.
+4. Select **Try €55,000**. No proof can be generated, because the circuit rejects out-of-range amounts.
+5. Edit any digit of the proof or commitment in **Check a receipt** → **Invalid**.
 
 ## How it works
 
 ```mermaid
 flowchart LR
-    subgraph Browser["Applicant data stays in the browser"]
-        Amount["Requested amount"] --> Rule["Versioned eligibility rule"]
-        Rule --> Decision{"Within €5,000–€50,000?"}
-        Decision -->|Yes| Pass["Within range"]
-        Decision -->|No| Reject["Outside range"]
-        Pass --> Receipt["Receipt fields + SHA-256"]
-        Reject --> Receipt
+    subgraph Browser["Applicant's browser (amount never leaves)"]
+        A["Amount + random salt"] --> P["Groth16 prover<br/>circuit: 5,000 ≤ amount ≤ 50,000<br/>commitment = Poseidon(1, amount, salt)"]
     end
-    Receipt -->|"Copy receipt link"| Checker["Recipient reads result and recalculates checksum"]
-    Checker --> Result["Match or mismatch"]
+    P -->|"proof + commitment only"| R["MeritSeal receipt"]
+    R --> V1["Anyone: verify in browser<br/>against published vkey"]
+    R --> S["/api/attest<br/>re-verifies, rate-limited"]
+    S --> K["Kurier relayer"] --> Z["zkVerify Volta<br/>on-chain Groth16 verification"]
+    R --> AG["MeritSeal agent<br/>Agent Games task → APPROVE / REJECT"]
 ```
 
-The checksum detects edits when compared against the original checksum. Anyone can recompute it, so it does not authenticate the issuer or independently prove that the rule was applied correctly. The [NLnet proof circuit and verification workflow](./proof/README.md) are in development. The live receipt uses a checksum. A separate synthetic testnet proof is linked below.
+- **Circuit** (`proof/nlnet-amount.circom`): private `amount` and `salt`; public output `commitment`. It constrains the amount to 16 bits, then `5000 ≤ amount ≤ 50000`. The commitment lets the applicant later open the exact amount to the funder (the "private opening" file) while nobody else learns it.
+- **Receipt** (`meritseal.zk-receipt.v2`): `policy_id`, `commitment`, `proof`, `public_signals`, `vkey_sha256`, `issued_at`, and zkVerify `job_id` / `tx_hash`. The "in range" result comes from the proof itself. No field of the receipt is trusted text.
+- **zkVerify**: the server re-verifies each proof locally (so junk never reaches the relay), registers the verification key once, submits via Kurier, and returns the job status and transaction hash.
+- **Key transparency**: `/zk/manifest.json` publishes the circuit, the verification-key SHA-256 and how the key was generated. Receipts made under a different key are rejected.
 
-## Agent service
+## The agent
 
-The browser checker and signed Agent Games callback use the same NLnet amount evaluator. The callback accepts `input.policy_id` set to `nlnet-first-grant-amount:v1` and an integer `input.amount_eur`. It validates signed requests and evaluates explicit policy rules deterministically. Signed decisions and response HMACs were tested locally. Production Agent Games preflight and practice remain unconfirmed.
+`POST /api/agent` is an [Agent Games](https://agentgames.zkverify.io) endpoint: HMAC-signed requests and responses, idempotent task IDs, deadline handling and preflight.
 
-| Method | Route | Purpose |
-| --- | --- | --- |
-| GET | [`/api/health`](https://meritseal.vercel.app/api/health) | Service and signing configuration status |
-| POST | `/api/agent` | Signed Agent Games callback |
+| Task input | Decision |
+| --- | --- |
+| `{ policy_id: "nlnet-first-grant-amount:v1", receipt: { proof, public_signals } }` | Verifies the Groth16 proof and returns `APPROVE / ZK_PROOF_VALID` plus the commitment. **It never sees the amount.** |
+| `{ policy_id: "nlnet-first-grant-amount:v1", amount_eur }` | Plain range check (`AMOUNT_IN_RANGE` / `AMOUNT_OUT_OF_RANGE`) |
+| `{ policy: { rules }, application }` | Generic versioned rule evaluation (`equals`, `gte`, `lte`, `includes`, …) |
+
+It fails closed: malformed receipts → `INVALID_RECEIPT`; a missing verifier or key → `VERIFIER_UNAVAILABLE`; bad signatures → 401.
 
 ## Run locally
 
-Node.js 20 or later.
+Requires Node 20+ and [circom 2.1.6+](https://docs.circom.io/getting-started/installation/).
 
 ```bash
-npm test
-npm start
+npm install
+npm run zk:setup      # compile circuit, Groth16 setup, write agent/public/zk/*
+npm run zk:check      # €5,000/€12,000/€50,000 prove & verify; €4,999/€50,001/€70,000 cannot prove; tampering rejected
+npm test              # agent, signing, receipt handling, static serving
+cp .env.example .env  # AGENT_GAMES_HMAC_SECRET, KURIER_API_KEY
+npm start             # http://localhost:3000
 ```
 
-Open `http://localhost:3000/`. For signed callback testing, set `AGENT_GAMES_HMAC_SECRET` in the service environment. Keep production secrets out of the repository. The retry cache is in memory.
+Deployed as a container (`Dockerfile`). Health: `GET /api/health` reports `secretConfigured`, `zkVerifierLoaded` and `attestationConfigured`.
 
-[Read the technical walkthrough](./docs/creator-walkthrough.md)
+## Limitations
+
+- One criterion only. NLnet decides eligibility and awards. MeritSeal proves the amount rule, not the merit of a proposal.
+- The Groth16 key comes from a single-party setup (details in `/zk/manifest.json`). A production deployment should run a multi-party phase-2 ceremony.
+- A receipt proves the *committed* amount is in range. Binding that commitment to the amount in the actual application is the funder's step, done with the private opening.
+- zkVerify submission uses the Volta testnet.
 
 ## Project policies
 
-[MIT license](./LICENSE) · [Security policy](./SECURITY.md) · [Code of conduct](./CODE_OF_CONDUCT.md)
-
-## Finalized testnet example
-
-[View zkVerify Volta transaction](https://zkverify-testnet.subscan.io/extrinsic/0xc480960248cd345a95f6b2b862d397445b475ed7a2c4149f54e12320bd5f29ea). Kurier reported `Finalized`. This synthetic example uses a development Groth16 setup. The proof covers one committed synthetic amount under policy v1. New browser receipts use checksums and carry neither an issuer signature nor a per-receipt proof.
+[Security](./SECURITY.md) · [Code of conduct](./CODE_OF_CONDUCT.md) · [MIT license](./LICENSE)

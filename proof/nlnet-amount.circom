@@ -3,13 +3,16 @@ pragma circom 2.1.6;
 include "circomlib/circuits/poseidon.circom";
 include "circomlib/circuits/comparators.circom";
 
-// Public commitment is Poseidon(policy version, whole-euro amount, private salt).
-// A valid proof establishes the published range, not applicant identity or award eligibility.
+// Proves: "the committed whole-euro amount is within NLnet's €5,000–€50,000 first-grant range".
+// Private inputs: amount, salt. Public output: commitment = Poseidon(policyVersion, amount, salt).
+// The commitment lets the applicant later open the exact amount to the funder; nobody else learns it.
+// A valid proof establishes the range only, not applicant identity or award eligibility.
 template NlnetFirstGrantAmountV1() {
     signal input amount;
     signal input salt;
-    signal input commitment;
+    signal output commitment;
 
+    // Bound the amount to 16 bits (max 65,535) so the comparators below are sound.
     component amountBits = Num2Bits(16);
     amountBits.in <== amount;
 
@@ -24,10 +27,10 @@ template NlnetFirstGrantAmountV1() {
     upper.out === 1;
 
     component digest = Poseidon(3);
-    digest.inputs[0] <== 1;
+    digest.inputs[0] <== 1;      // policy version: nlnet-first-grant-amount:v1
     digest.inputs[1] <== amount;
     digest.inputs[2] <== salt;
-    digest.out === commitment;
+    commitment <== digest.out;
 }
 
-component main {public [commitment]} = NlnetFirstGrantAmountV1();
+component main = NlnetFirstGrantAmountV1();

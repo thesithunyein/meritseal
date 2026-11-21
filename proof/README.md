@@ -1,39 +1,25 @@
 # NLnet first-grant amount proof
 
-The circuit binds a private whole-euro amount to one public Poseidon commitment and enforces the inclusive €5,000–€50,000 range from [NLnet's application form](https://nlnet.nl/propose/). Verification establishes only this amount criterion. The verifying key identifies this circuit and policy version. Keep the amount, salt, and witness private.
+`nlnet-amount.circom` proves that a private whole-euro `amount` is within NLnet's inclusive €5,000–€50,000 first-grant range ([NLnet application form](https://nlnet.nl/propose/)). It also outputs `commitment = Poseidon(1, amount, salt)` as the only public signal. The leading `1` is the policy version. Keep the amount, the salt and the witness private.
 
-## Local development
-
-With Circom 2.1.6+ and Node installed, install the proof dependencies in the repository with `npm install --no-save --package-lock=false circomlib circomlibjs snarkjs`. Use synthetic amounts during development.
+## Build the key and artifacts
 
 ```bash
-mkdir -p proof/build
-circom proof/nlnet-amount.circom -l node_modules --r1cs --wasm -o proof/build
-node proof/example-input.mjs 12000 > proof/build/private-input.json
-node proof/build/nlnet-amount_js/generate_witness.js proof/build/nlnet-amount_js/nlnet-amount.wasm proof/build/private-input.json proof/build/witness.wtns
+npm install                       # snarkjs + circomlib
+npm run zk:setup                  # local two-phase setup with fresh random entropy
+# or: node proof/setup.mjs --ptau powersOfTau28_hez_final_12.ptau   (public phase-1 file)
+npm run zk:check
 ```
 
-Use a trusted Powers of Tau phase-2 file large enough for the circuit and a reviewed circuit-specific Groth16 ceremony. Export its verification key, prove with the final zkey, and verify locally using snarkjs. A development setup with public entropy is suitable only for testing. Never publish the input JSON or witness, and do not reuse the salt across requests.
+`setup.mjs` writes `agent/public/zk/`: `nlnet-amount.wasm`, `nlnet-amount.zkey`, `vkey.json`, `snarkjs.min.js` and `manifest.json` (with the verification-key SHA-256). Commit these files. The browser proves with them and the server verifies with `vkey.json`. Re-running the setup creates a new key, and receipts made under the old key will no longer verify.
 
-Test that €5,000 and €50,000 pass, €4,999 and €50,001 fail, and changing the public commitment invalidates a passing proof. The assertion that the amount falls in range is fixed in this circuit, so a receipt verifier should derive the passing outcome from successful proof verification and reject contradictory receipt text.
+## What `zk:check` asserts
 
-## Network verification
-
-Follow the [zkVerify quickstart](https://docs.zkverify.io/handbook/quickstart) with the Groth16 proof, verification key, and public signals. Kurier requires a testnet API key. The direct route requires a funded network account. Publish the finalized verification reference only after confirming it corresponds to this circuit and commitment.
-
-## Verified locally
-
-| Check | Result |
+| Input | Expected |
 | --- | --- |
-| €5,000 and €50,000 | Groth16 proofs verified |
-| €4,999 and €50,001 | Circuit rejected the witness |
-| Changed public commitment | Verification rejected both altered proofs |
-| Signed `POST /api/agent` on loopback | Correct decisions and valid response HMACs for all four inputs |
+| €5,000, €12,000, €50,000 | Proof generated and verified; a proof checked against a changed commitment fails |
+| €4,999, €50,001, €70,000 | No witness, so no proof can be produced |
 
-Run `npm test` for the signed callback checks. For circuit regression checks, place the development zkey and exported verification key at `proof/build/dev.zkey` and `proof/build/dev.vkey.json`, then run `node proof/verify-boundaries.mjs`. Pass an alternate WASM path as the first argument if needed.
+## zkVerify
 
-These tests used a local development Groth16 setup and a test HMAC key. Agent Games production preflight remains pending.
-
-## Finalized testnet example
-
-[View zkVerify Volta transaction](https://zkverify-testnet.subscan.io/extrinsic/0xc480960248cd345a95f6b2b862d397445b475ed7a2c4149f54e12320bd5f29ea). Kurier reported `Finalized`. This synthetic example uses a development Groth16 setup. The transaction applies to the sample only. Browser-generated receipts still use checksums.
+`POST /api/attest` re-verifies a proof server-side, then submits it to zkVerify through Kurier (`register-vk` once, then `submit-proof` and `job-status`). It needs `KURIER_API_KEY`. The earlier sample transaction ([Subscan](https://zkverify-testnet.subscan.io/extrinsic/0xc480960248cd345a95f6b2b862d397445b475ed7a2c4149f54e12320bd5f29ea)) used the v1 development key. New receipts carry their own transaction.

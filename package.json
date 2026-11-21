@@ -1,2 +1,21 @@
-{"name":"meritseal-agent","version":"0.1.0","private":true,"type":"module","scripts":{"start":"node agent/server.mjs","test":"node --test agent/server.test.mjs"},"engines":{"node":">=20"}}
-
+{
+  "name": "meritseal-agent",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node agent/server.mjs",
+    "test": "node --test agent/*.test.mjs",
+    "zk:setup": "node proof/setup.mjs",
+    "zk:check": "node proof/verify-boundaries.mjs"
+  },
+  "dependencies": {
+    "snarkjs": "^0.7.5"
+  },
+  "devDependencies": {
+    "circomlib": "^2.0.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
