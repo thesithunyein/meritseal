@@ -20,7 +20,7 @@ Built for the **zkVerify Agent Games, Wildcard track**. Live: **https://meritsea
 | --- | --- |
 | **Useful problem** | [The problem](#the-problem): applicants need a pre-check against the funder's rules, and grant programs need to show compliance without publishing budgets. |
 | **Working implementation** | Live at [meritseal.vercel.app/#screen](https://meritseal.vercel.app/#screen). Select **Use a strong example**, then **Check my application** (about 30 s). The agent code is in [`agent/`](./agent), and [14 automated tests](#tests) cover it. |
-| **Clear explanation** | [What the agent does](#what-the-agent-does), [what it can and cannot do](#what-it-can-and-cannot-do), [how it works](#how-it-works) and [limitations](#limitations). |
+| **Clear explanation** | [What the agent does](#what-the-agent-does), [what it can and cannot do](#what-it-can-and-cannot-do), [how it works](#how-it-works), [key design decisions](#key-design-decisions) and [limitations](#limitations). |
 | **Verifiability (zkVerify)** | Each budget proof is a Groth16 proof verified on zkVerify Volta through Kurier. Example finalized transaction: [`0x8cbc2d54…16ba7afc`](https://zkverify-testnet.subscan.io/extrinsic/0x8cbc2d54acf347b4f44f8878197930d841bfad845a6b0c3666d6941616ba7afc). The circuit is [`proof/nlnet-amount.circom`](./proof/nlnet-amount.circom), and the key manifest is at [`/zk/manifest.json`](https://meritseal.vercel.app/zk/manifest.json). |
 | **Public endpoint** | `POST https://meritseal.vercel.app/api/screen` (AI screening) and `POST /api/agent` (Agent Games, HMAC-signed). See [Agent API](#agent-api). |
 
@@ -86,6 +86,16 @@ flowchart LR
 - **zkVerify**: the server re-verifies each proof before relaying it (so junk never reaches the chain), registers the verification key once at boot, submits through [Kurier](https://docs.zkverify.io/overview/getting-started/kurier) and polls the job until it is finalized.
 - **AI safety**: the model's output is constrained to the seven known rule IDs and three verdicts; anything else becomes NEEDS_INFO. Text in the application is treated as data, not instructions. All model output is rendered with `textContent`, never as HTML.
 - **Key transparency**: [`/zk/manifest.json`](https://meritseal.vercel.app/zk/manifest.json) publishes the circuit, the verification-key SHA-256 and how the key was generated. Proofs made under a different key are rejected.
+
+## Key design decisions
+
+- **Prove the one number, let the AI read the rest.** Six of NLnet's requirements are about meaning (licence, scope, standards) and suit a language model. The budget rule is a number that must stay private, so it is decided by a zero-knowledge proof, not by the model.
+- **Redact twice.** Amounts are removed in the browser and again on the server, so a bug in one place does not leak a budget. Standard identifiers such as `RFC 4791` are kept, because the open-standards check needs them.
+- **Prove in the browser.** The proof is generated on the applicant's device, so the budget never reaches MeritSeal's server. The server only re-checks the proof.
+- **Constrain the model.** The prompt treats the application as data, and the output is validated against seven fixed rule IDs and three verdicts. Every verdict must quote its evidence, so a person can check the AI.
+- **Approve only on both.** `APPROVE` needs all seven rules to pass **and** a valid proof. Errors fail closed: no verifier or no model means `REJECT`, never a silent pass.
+- **zkVerify for the public record.** Verifying each proof on zkVerify (through Kurier) gives funders and auditors an independent, permanent check, and keeps on-chain verification cheap compared with a general-purpose chain. The applicant needs no wallet: the service pays for the submission.
+- **Rules as data.** The seven rules live in one list in [`agent/screen.mjs`](./agent/screen.mjs), each with NLnet's own wording, so adding another funder means adding another list.
 
 ## Agent API
 
