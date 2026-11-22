@@ -90,6 +90,7 @@ test("serves the app and the ZK script, nothing else", async (t) => {
   const og = await fetch(`${base}/og.png`);
   assert.equal(og.status, 200);
   assert.equal(og.headers.get("content-type"), "image/png");
+  for (const icon of ["/favicon.ico", "/favicon.svg", "/apple-touch-icon.png"]) assert.equal((await fetch(`${base}${icon}`)).status, 200, icon);
   assert.equal((await fetch(`${base}/package.json`)).status, 404);
   assert.equal((await fetch(`${base}/zk/../server.mjs`)).status, 404);
 });
