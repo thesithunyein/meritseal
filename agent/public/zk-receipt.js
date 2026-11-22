@@ -318,13 +318,23 @@ This application was generated with our own AI tool to show how powerful it is.`
       if (url) line.append(el("a", { href: url, target: "_blank", rel: "noopener" }, `${recordLabel(z)} · view on zkVerify`));
       else line.append(z?.status && /^Relay/.test(z.status) ? "not recorded yet" : RECORD_TEXT[z?.status] ?? "Sending…");
       panel.append(line);
+    } else if (state.budgetFailed) {
+      const line = el("p", { class: "proof-line", "data-ok": "false" });
+      line.append(el("span", { class: "dot", "aria-hidden": "true" }, "🔒"), state.budgetLow ? "Budget below €5,000: no proof can be made, so nothing about it was shared." : "Budget above €50,000: no proof can be made, so nothing about it was shared.");
+      panel.append(line);
     }
     if (r.assessment.project_summary) panel.append(el("p", { class: "hint" }, `The AI understood your project as: ${r.assessment.project_summary}`));
 
+    // Compact row: verdict, rule and one-line reason. Expanding it shows the quote and NLnet's wording.
     const ruleItem = (c) => {
       const li = el("li", { "data-verdict": c.verdict });
-      li.append(el("span", { class: "tag" }, VERDICT_LABEL[c.verdict]), el("b", {}, c.label), el("p", {}, c.reason));
-      if (c.evidence) li.append(el("q", {}, `From your text: ${c.evidence}`));
+      const d = el("details"), sum = el("summary"), head = el("span", { class: "rule-head" });
+      head.append(el("span", { class: "tag" }, VERDICT_LABEL[c.verdict]), el("b", {}, c.label));
+      sum.append(el("span", { class: "rule-main" }));
+      sum.firstChild.append(head, el("span", { class: "rule-reason" }, c.reason));
+      d.append(sum);
+      const more = el("div", { class: "rule-more" });
+      if (c.evidence) more.append(el("q", {}, `From your text: ${c.evidence}`));
       if (c.id === "budget" && state.receipt) {
         const z = state.receipt.zkverify, rec = el("p", { class: "public-record" });
         const url = safeExplorer(z?.explorer_url);
@@ -332,9 +342,11 @@ This application was generated with our own AI tool to show how powerful it is.`
         if (url) rec.append(el("a", { href: url, target: "_blank", rel: "noopener" }, `${recordLabel(z)} · view on zkVerify`));
         else rec.append(z?.status && /^Relay/.test(z.status) ? "not recorded yet " : RECORD_TEXT[z?.status] ?? "Sending…");
         if (z?.status && /^Relay/.test(z.status)) { const retry = el("button", { class: "button quiet small", type: "button" }, "Try recording again"); retry.onclick = () => { state.receipt.zkverify = { status: "Queued" }; renderScreen(state); anchor(state.receipt, () => renderScreen(state)); }; rec.append(retry); }
-        li.append(rec);
+        more.append(rec);
       }
-      li.append(el("small", {}, `NLnet rule: ${c.source}`));
+      more.append(el("small", {}, `NLnet rule: ${c.source}`));
+      d.append(more);
+      li.append(d);
       return li;
     };
     const group = (title, items, open = true) => {
