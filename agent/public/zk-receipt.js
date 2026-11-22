@@ -462,9 +462,9 @@ This application was generated with our own AI tool to show how powerful it is.`
       const row = { n: i + 1, commitment: r?.commitment ?? "", status: "INVALID", note: "", zk: r?.zkverify ?? null, issued: r?.issued_at ?? "" };
       if (!r || r.type !== RECEIPT_TYPE || r.policy_id !== POLICY_ID || !Array.isArray(r.public_signals) || r.public_signals.length !== 1) row.note = "Not a MeritSeal budget proof";
       else if (r.vkey_sha256 && r.vkey_sha256 !== key.sha256) row.note = "Made with a different proof key";
-      else if (r.commitment !== r.public_signals[0]) row.note = "Altered: ID does not match the proof";
-      else if (!await snarkjs.groth16.verify(key.vkey, r.public_signals, r.proof).catch(() => false)) row.note = "Altered: the math does not check out";
-      else if (seen.has(r.commitment)) { row.status = "DUPLICATE"; row.note = `Same proof as #${seen.get(r.commitment)}, reused`; }
+      else if (r.commitment !== r.public_signals[0]) row.note = "altered: ID does not match the proof";
+      else if (!await snarkjs.groth16.verify(key.vkey, r.public_signals, r.proof).catch(() => false)) row.note = "altered: the proof does not verify";
+      else if (seen.has(r.commitment)) { row.status = "DUPLICATE"; row.note = `same proof as #${seen.get(r.commitment)}`; }
       else { row.status = "VALID"; row.note = "Budget within €5,000–€50,000"; seen.set(r.commitment, row.n); }
       rows.push(row);
     }
@@ -476,21 +476,31 @@ This application was generated with our own AI tool to show how powerful it is.`
     out.replaceChildren();
     const valid = rows.filter(r => r.status === "VALID").length;
     const anchored = rows.filter(r => r.status === "VALID" && r.zk?.tx_hash).length;
+    const altered = rows.filter(r => r.status === "INVALID").length, copies = rows.filter(r => r.status === "DUPLICATE").length;
     const summary = el("div", { class: "audit-summary" });
     const big = el("p", { class: "audit-big", "data-ok": String(valid === rows.length) }, `${valid} of ${rows.length} within the budget rule`);
-    summary.append(big, el("p", {}, `${rows.length - valid} rejected. ${anchored} of the valid proofs also have a public zkVerify record. No budget was revealed: each row shows only an anonymous ID.`));
+    const parts = [];
+    if (altered) parts.push(`${altered} altered`);
+    if (copies) parts.push(`${copies} cop${copies === 1 ? "y" : "ies"}`);
+    const rejected = rows.length - valid;
+    const line = `${rejected ? `${rejected} rejected${parts.length ? ` (${parts.join(", ")})` : ""}. ` : "Nothing rejected. "}No budget was revealed: each proof shows only an anonymous ID.${anchored ? ` ${anchored} also ha${anchored === 1 ? "s" : "ve"} a public zkVerify record.` : ""}`;
+    summary.append(big, el("p", {}, line));
+    const showRecord = rows.some(r => r.zk);
     const table = el("table", { class: "audit-table" });
-    const head = el("tr"); for (const h of ["#", "Anonymous ID", "Result", "Public record", "Created"]) head.append(el("th", {}, h));
+    const head = el("tr");
+    for (const h of ["#", "Anonymous ID", "Result", ...(showRecord ? ["Public record"] : [])]) head.append(el("th", {}, h));
     table.append(el("thead")); table.tHead.append(head);
     const tbody = el("tbody");
     for (const r of rows) {
       const tr = el("tr", { "data-status": r.status }); tr.style.setProperty("--i", r.n);
       tr.append(el("td", {}, String(r.n)), el("td", {}, r.commitment ? short(String(r.commitment)) : "—"));
-      const res = el("td"); res.append(el("b", {}, { VALID: "Valid", INVALID: "Rejected", DUPLICATE: "Copy" }[r.status]), el("small", {}, r.note)); tr.append(res);
-      const zk = el("td");
-      if (r.zk?.explorer_url && /^https:\/\/zkverify[\w.-]*\.subscan\.io\/extrinsic\/0x[0-9a-f]{64}$/i.test(r.zk.explorer_url)) zk.append(el("a", { href: r.zk.explorer_url, target: "_blank", rel: "noopener" }, r.zk.status ?? "tx"));
-      else zk.textContent = r.zk?.status ?? "—";
-      tr.append(zk, el("td", {}, r.issued ? new Date(r.issued).toLocaleDateString("en-GB") : "—"));
+      const res = el("td"); res.append(el("b", {}, { VALID: "Valid", INVALID: "Rejected", DUPLICATE: "Copy" }[r.status]), el("span", { class: "note" }, r.status === "VALID" ? "in range" : r.note)); tr.append(res);
+      if (showRecord) {
+        const zk = el("td");
+        if (r.zk?.explorer_url && /^https:\/\/zkverify[\w.-]*\.subscan\.io\/extrinsic\/0x[0-9a-f]{64}$/i.test(r.zk.explorer_url)) zk.append(el("a", { href: r.zk.explorer_url, target: "_blank", rel: "noopener" }, recordLabel(r.zk)));
+        else zk.textContent = "—";
+        tr.append(zk);
+      }
       tbody.append(tr);
     }
     table.append(tbody);
