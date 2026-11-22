@@ -48,7 +48,7 @@
     if (!current) { out.hidden = true; return; }
     const r = current.receipt, z = r.zkverify;
     const safeUrl = z?.explorer_url && /^https:\/\/zkverify[\w.-]*\.subscan\.io\/extrinsic\/0x[0-9a-f]{64}$/i.test(z.explorer_url) ? z.explorer_url : null;
-    const label = { Queued: "Sending…", Submitted: "Sending…", IncludedInBlock: "Recorded, confirming…", Finalized: "Confirmed", Aggregated: "Confirmed", AggregationPublished: "Confirmed" }[z?.status] ?? z?.status;
+    const label = recordLabel(z);
     const chain = !z ? "Sending…" : safeUrl
       ? `<a href="${esc(safeUrl)}" target="_blank" rel="noopener">${esc(label)} · view on zkVerify</a>`
       : esc(/^Relay/.test(z.status) ? "Not recorded yet" : label);
@@ -84,7 +84,7 @@
       if (!res.ok) { receipt.zkverify = { network: "zkVerify Volta testnet", status: res.status === 503 ? "Relay not configured" : `Relay error (${body.error ?? res.status})` }; return update(); }
       receipt.zkverify = { network: "zkVerify Volta testnet", job_id: body.job_id, vk_hash: body.vk_hash, status: "Queued" };
       update();
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < 90; i++) {
         await new Promise(r => setTimeout(r, 4000));
         const s = await fetch(`/api/attest/${encodeURIComponent(body.job_id)}`).then(r => r.ok ? r.json() : null).catch(() => null);
         if (!s) continue;
@@ -239,6 +239,8 @@ This application was generated with our own AI tool to show how powerful it is.`
   const STEPS = [["redact", "Removing amounts from your text"], ["prove", "Checking your budget on this device"], ["ai", "AI agent reading your application"], ["record", "Recording the budget proof publicly"]];
   const safeExplorer = (url) => url && /^https:\/\/zkverify[\w.-]*\.subscan\.io\/extrinsic\/0x[0-9a-f]{64}$/i.test(url) ? url : null;
   const RECORD_TEXT = { Queued: "Sending…", Submitted: "Sending…", IncludedInBlock: "Recorded, confirming…", Finalized: "Confirmed", Aggregated: "Confirmed", AggregationPublished: "Confirmed", Failed: "Could not be recorded" };
+  // Once a transaction hash exists the proof is on-chain, even if the relay still reports "Submitted".
+  const recordLabel = (z) => z?.tx_hash && (z.status === "Queued" || z.status === "Submitted") ? "Recorded, confirming…" : RECORD_TEXT[z?.status] ?? z?.status ?? "Sending…";
 
   // Builds the list of checks shown to the person: the budget (decided by math) plus the AI's seven rules.
   function checksFor(state) {
@@ -313,7 +315,7 @@ This application was generated with our own AI tool to show how powerful it is.`
       const z = state.receipt.zkverify, url = safeExplorer(z?.explorer_url);
       const line = el("p", { class: "proof-line" });
       line.append(el("span", { class: "dot", "aria-hidden": "true" }, "🔒"), "Budget proven in range on this device. Public record: ");
-      if (url) line.append(el("a", { href: url, target: "_blank", rel: "noopener" }, `${RECORD_TEXT[z.status] ?? z.status} · view on zkVerify`));
+      if (url) line.append(el("a", { href: url, target: "_blank", rel: "noopener" }, `${recordLabel(z)} · view on zkVerify`));
       else line.append(z?.status && /^Relay/.test(z.status) ? "not recorded yet" : RECORD_TEXT[z?.status] ?? "Sending…");
       panel.append(line);
     }
@@ -327,7 +329,7 @@ This application was generated with our own AI tool to show how powerful it is.`
         const z = state.receipt.zkverify, rec = el("p", { class: "public-record" });
         const url = safeExplorer(z?.explorer_url);
         rec.append("Public proof record: ");
-        if (url) rec.append(el("a", { href: url, target: "_blank", rel: "noopener" }, `${RECORD_TEXT[z.status] ?? z.status} · view on zkVerify`));
+        if (url) rec.append(el("a", { href: url, target: "_blank", rel: "noopener" }, `${recordLabel(z)} · view on zkVerify`));
         else rec.append(z?.status && /^Relay/.test(z.status) ? "not recorded yet " : RECORD_TEXT[z?.status] ?? "Sending…");
         if (z?.status && /^Relay/.test(z.status)) { const retry = el("button", { class: "button quiet small", type: "button" }, "Try recording again"); retry.onclick = () => { state.receipt.zkverify = { status: "Queued" }; renderScreen(state); anchor(state.receipt, () => renderScreen(state)); }; rec.append(retry); }
         li.append(rec);
