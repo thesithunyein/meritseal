@@ -314,13 +314,14 @@ This application was generated with our own AI tool to show how powerful it is.`
     if (state.receipt) {
       const z = state.receipt.zkverify, url = safeExplorer(z?.explorer_url);
       const line = el("p", { class: "proof-line" });
-      line.append(el("span", { class: "dot", "aria-hidden": "true" }, "🔒"), "Budget proven in range on this device. Public record: ");
-      if (url) line.append(el("a", { href: url, target: "_blank", rel: "noopener" }, `${recordLabel(z)} · view on zkVerify`));
-      else line.append(z?.status && /^Relay/.test(z.status) ? "not recorded yet" : RECORD_TEXT[z?.status] ?? "Sending…");
+      const text = el("span", {}, "Budget proven in range on this device. Public record: ");
+      if (url) text.append(el("a", { href: url, target: "_blank", rel: "noopener" }, `${recordLabel(z)} · view on zkVerify`));
+      else text.append(z?.status && /^Relay/.test(z.status) ? "not recorded yet" : RECORD_TEXT[z?.status] ?? "Sending…");
+      line.append(el("span", { class: "dot", "aria-hidden": "true" }, "🔒"), text);
       panel.append(line);
     } else if (state.budgetFailed) {
       const line = el("p", { class: "proof-line", "data-ok": "false" });
-      line.append(el("span", { class: "dot", "aria-hidden": "true" }, "🔒"), state.budgetLow ? "Budget below €5,000: no proof can be made, so nothing about it was shared." : "Budget above €50,000: no proof can be made, so nothing about it was shared.");
+      line.append(el("span", { class: "dot", "aria-hidden": "true" }, "🔒"), el("span", {}, state.budgetLow ? "Budget below €5,000: no proof can be made, so nothing about it was shared." : "Budget above €50,000: no proof can be made, so nothing about it was shared."));
       panel.append(line);
     }
     if (r.assessment.project_summary) panel.append(el("p", { class: "hint" }, `The AI understood your project as: ${r.assessment.project_summary}`));
