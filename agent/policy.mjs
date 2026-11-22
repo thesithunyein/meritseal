@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { screenApplication } from "./screen.mjs";
 
 export const NLNET_POLICY_ID = "nlnet-first-grant-amount:v1";
 const ZK_DIR = new URL("./public/zk/", import.meta.url);
@@ -63,8 +64,25 @@ export async function verifyZkReceipt(receipt, verifier) {
     : { decision: "REJECT", reason_code: "ZK_PROOF_INVALID" };
 }
 
+// Full screening: Gemini assesses the (redacted) application against NLnet's rules and the budget
+// rule is satisfied only by a valid zero-knowledge receipt. APPROVE needs both.
+export async function screenAndDecide(input, verifier, screen = screenApplication) {
+  const [assessment, budget] = await Promise.all([
+    screen(input.application_text),
+    input.receipt ? verifyZkReceipt(input.receipt, verifier) : Promise.resolve({ decision: "REJECT", reason_code: "BUDGET_PROOF_MISSING" })
+  ]);
+  const budgetOk = budget.reason_code === "ZK_PROOF_VALID";
+  const approve = assessment.overall === "READY" && budgetOk;
+  const reason_code = approve ? "SCREEN_PASSED" : !budgetOk ? budget.reason_code : assessment.overall === "NOT_READY" ? "SCREEN_NOT_READY" : "SCREEN_NEEDS_WORK";
+  return { decision: approve ? "APPROVE" : "REJECT", reason_code, budget: { ...budget }, assessment };
+}
+
 export async function decide(task, verifier) {
   const input = task.input ?? {};
+  if (typeof input.application_text === "string") {
+    try { return await screenAndDecide(input, verifier); }
+    catch (error) { return { decision: "REJECT", reason_code: "SCREENING_UNAVAILABLE", detail: String(error.message).slice(0, 60) }; }
+  }
   if (input.policy_id === NLNET_POLICY_ID) {
     // Preferred path: the applicant sends a zero-knowledge receipt; the agent never sees the amount.
     if (input.receipt || input.proof) return verifyZkReceipt(input.receipt ?? input, verifier);

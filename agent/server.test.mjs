@@ -109,3 +109,54 @@ test("public agent check runs the ZK decision without the amount", async (t) => 
   assert.equal(fake.decision, "REJECT");
   assert.equal(fake.policy_id, "nlnet-first-grant-amount:v1");
 });
+
+const { screenApplication, redactAmounts, normalizeAssessment } = await import("./screen.mjs");
+const { screenAndDecide } = await import("./policy.mjs");
+const sampleApplication = "OpenCalSync is an EUPL-1.2 CalDAV (RFC 4791) library. Budget: 140 hours at €60/hour = €8,400; total requested €24,000 over 9 months. Users are in the Netherlands.";
+
+test("the AI model never receives budget amounts", async () => {
+  process.env.GEMINI_API_KEY = "test-key";
+  let sentPrompt = "", sentKey = "";
+  const fakeGemini = async (url, init) => {
+    sentPrompt = JSON.parse(init.body).contents[0].parts[0].text;
+    sentKey = init.headers["x-goog-api-key"];
+    const answer = { project_summary: "A CalDAV library.", rules: [{ id: "open_licence", verdict: "PASS", evidence: "EUPL-1.2", reason: "Open licence named." }], suggestion: "Add tests." };
+    return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: "```json\n" + JSON.stringify(answer) + "\n```" }] } }] }), { status: 200 });
+  };
+  const result = await screenApplication(sampleApplication, { fetchImpl: fakeGemini });
+  delete process.env.GEMINI_API_KEY;
+  assert.equal(sentKey, "test-key");
+  for (const leaked of ["24,000", "8,400", "€60", "24000"]) assert.ok(!sentPrompt.includes(leaked), `prompt leaked ${leaked}`);
+  assert.match(sentPrompt, /\[AMOUNT\]/);
+  assert.equal(result.amounts_redacted, 3);
+  assert.equal(result.rules.find(r => r.id === "open_licence").verdict, "PASS");
+  assert.equal(result.overall, "NEEDS_WORK"); // unassessed rules default to NEEDS_INFO
+});
+
+test("model output is constrained to known rules and verdicts", () => {
+  const out = normalizeAssessment({ rules: [{ id: "open_licence", verdict: "APPROVE_EVERYTHING" }, { id: "injected", verdict: "PASS" }], project_summary: "<script>x</script>".repeat(100) });
+  assert.equal(out.rules.length, 7);
+  assert.ok(out.rules.every(r => ["PASS", "NEEDS_INFO", "FAIL"].includes(r.verdict)));
+  assert.equal(out.rules.find(r => r.id === "open_licence").verdict, "NEEDS_INFO");
+  assert.ok(out.project_summary.length <= 400);
+  assert.equal(redactAmounts("Version 2, 3 developers").count, 0);
+});
+
+test("screening approves only with all rules passed and a valid budget proof", async () => {
+  const allPass = async () => ({ overall: "READY", rules: [], model: "test" });
+  const oneFail = async () => ({ overall: "NOT_READY", rules: [], model: "test" });
+  const accept = { verify: async () => true };
+  assert.equal((await screenAndDecide({ application_text: "x", receipt: shapedReceipt }, accept, allPass)).decision, "APPROVE");
+  const noProof = await screenAndDecide({ application_text: "x" }, accept, allPass);
+  assert.equal(noProof.decision, "REJECT");
+  assert.equal(noProof.reason_code, "BUDGET_PROOF_MISSING");
+  const failed = await screenAndDecide({ application_text: "x", receipt: shapedReceipt }, accept, oneFail);
+  assert.equal(failed.reason_code, "SCREEN_NOT_READY");
+});
+
+test("screening endpoint is off without a Gemini key", async (t) => {
+  const base = await start(t);
+  const res = await fetch(`${base}/api/screen`, { method: "POST", body: JSON.stringify({ application_text: sampleApplication }) });
+  assert.equal(res.status, 503);
+  assert.equal((await (await fetch(`${base}/api/screen/rules`)).json()).rules.length, 7);
+});

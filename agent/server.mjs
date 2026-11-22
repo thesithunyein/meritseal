@@ -2,7 +2,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { decide, loadVerifier, NLNET_POLICY_ID, parseZkReceipt } from "./policy.mjs";
+import { decide, loadVerifier, NLNET_POLICY_ID, parseZkReceipt, screenAndDecide } from "./policy.mjs";
+import { geminiConfigured, geminiModel, SCREENING_RULES } from "./screen.mjs";
 import { jobStatus, kurierConfigured, submitProof, vkHash } from "./kurier.mjs";
 
 const secret = process.env.AGENT_GAMES_HMAC_SECRET ?? "";
@@ -101,6 +102,23 @@ async function agentCheck(req, res) {
   return json(res, 200, { agent: "meritseal", policy_id: NLNET_POLICY_ID, ...result, checked_at: new Date().toISOString() });
 }
 
+// POST /api/screen: the AI agent screens a (redacted) application and, if a ZK receipt is attached,
+// checks the budget proof too. The browser has already removed amounts; the server redacts again.
+async function screen(req, res) {
+  if (!geminiConfigured()) return json(res, 503, { error: "screening_not_configured" });
+  if (rateLimited(req, 5)) return json(res, 429, { error: "rate_limited" });
+  let body;
+  try { body = JSON.parse(await rawBody(req)); } catch { return json(res, 400, { error: "invalid_json" }); }
+  if (typeof body?.application_text !== "string") return json(res, 400, { error: "missing_application_text" });
+  try {
+    const result = await screenAndDecide({ application_text: body.application_text, receipt: body.receipt });
+    return json(res, 200, { agent: "meritseal", policy_id: NLNET_POLICY_ID, ...result, checked_at: new Date().toISOString() });
+  } catch (error) {
+    const code = String(error.message ?? error);
+    return json(res, code === "application_too_short" ? 400 : 502, { error: code.slice(0, 60) });
+  }
+}
+
 async function attestStatus(res, jobId) {
   if (!kurierConfigured()) return json(res, 503, { error: "attestation_not_configured" });
   if (!/^[0-9a-f-]{8,64}$/i.test(jobId)) return json(res, 400, { error: "invalid_job_id" });
@@ -137,10 +155,12 @@ export function createAgentServer() {
       if (req.method === "GET" && await serveStatic(res, path)) return;
       if (req.method === "GET" && (path === "/health" || path === "/api/health")) {
         const verifier = await loadVerifier();
-        return json(res, 200, { ok: true, service: "meritseal-agent", secretConfigured: Boolean(secret), zkVerifierLoaded: Boolean(verifier), attestationConfigured: kurierConfigured() });
+        return json(res, 200, { ok: true, service: "meritseal-agent", secretConfigured: Boolean(secret), zkVerifierLoaded: Boolean(verifier), attestationConfigured: kurierConfigured(), screeningConfigured: geminiConfigured() });
       }
       if (req.method === "POST" && path === "/api/attest") return await attest(req, res);
       if (req.method === "POST" && path === "/api/agent/check") return await agentCheck(req, res);
+      if (req.method === "POST" && path === "/api/screen") return await screen(req, res);
+      if (req.method === "GET" && path === "/api/screen/rules") return json(res, 200, { policy_id: NLNET_POLICY_ID, model: geminiModel(), rules: SCREENING_RULES });
       if (req.method === "GET" && path.startsWith("/api/attest/")) return await attestStatus(res, path.slice("/api/attest/".length));
       if (req.method === "POST" && (path === "/agent" || path === "/api/agent")) return await agentTask(req, res);
       return json(res, 404, { error: "not_found" });
