@@ -274,6 +274,17 @@ This application was generated with our own AI tool to show how powerful it is.`
     const out = $("screenResult"), placeholder = $("screenPlaceholder");
     out.replaceChildren();
     out.parentElement.classList.toggle("static", Boolean(state?.result));
+    // Left-hand summary, so the form column stays useful next to a long report.
+    const note = $("screenReady");
+    if (state?.result) {
+      const ok = state.result.decision === "APPROVE";
+      const todo = checksFor(state).filter(c => c.verdict !== "PASS").length;
+      note.dataset.ok = String(ok);
+      note.querySelector(".dot").textContent = ok ? "✓" : "!";
+      $("screenReadyTitle").textContent = ok ? "Report ready: all checks passed" : `Report ready: ${todo} thing${todo === 1 ? "" : "s"} to fix`;
+      $("screenReadyText").textContent = ok ? "Copy or download it from the report. You can edit and check again anytime." : "Fix them in your text above, then select Check my application again.";
+      note.hidden = false;
+    } else note.hidden = true;
     if (!state) { out.hidden = true; placeholder.hidden = false; return; }
     out.hidden = false; placeholder.hidden = true;
     const panel = el("div", { class: "panel" });
