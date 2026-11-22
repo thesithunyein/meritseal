@@ -62,6 +62,7 @@
         <button class="button quiet" type="button" id="zkDownload">Download receipt</button>
         <button class="button quiet" type="button" id="zkOpening">Save private opening</button></div>
         <p class="receipt-limit" style="margin:10px 0 0;font-size:.85rem">The private opening (amount + salt) lets you later prove the exact amount to the funder. Keep it; do not share it with reviewers.</p></div>
+      ${z && /^Relay/.test(z.status) ? '<p style="margin:10px 0 0"><button class="button quiet" type="button" id="zkRetry">Retry zkVerify submission</button></p>' : ""}
       <p class="toast" id="zkToast" hidden></p></article>`;
     out.hidden = false;
     const toast = (t) => { $("zkToast").textContent = t; $("zkToast").hidden = false; };
@@ -70,6 +71,7 @@
       try { await navigator.clipboard.writeText(link); toast("Receipt link copied. It contains the proof, not the amount."); }
       catch { prompt("Copy this receipt link", link); }
     };
+    if ($("zkRetry")) $("zkRetry").onclick = () => { r.zkverify = { network: "zkVerify Volta testnet", status: "Retrying" }; renderReceipt(); anchor(r); };
     $("zkDownload").onclick = () => download(`meritseal-receipt-${r.commitment.slice(0, 8)}.json`, r);
     $("zkOpening").onclick = () => download(`meritseal-opening-PRIVATE-${r.commitment.slice(0, 8)}.json`, current.opening);
   }
@@ -149,11 +151,26 @@
       const z = receipt.zkverify;
       const chain = z?.tx_hash ? ` Also verified on zkVerify (${z.status}).` : "";
       status(out, `Valid: the committed amount is between €5,000 and €50,000. The amount itself is not in the receipt.${chain}`, "pass");
+      askAgent(receipt);
       const link = $("zkVerifyChain");
       if (z?.explorer_url && /^https:\/\/zkverify[\w.-]*\.subscan\.io\/extrinsic\/0x[0-9a-f]{64}$/i.test(z.explorer_url)) { link.href = z.explorer_url; link.hidden = false; }
       else link.hidden = true;
     } catch (error) {
       status(out, `Could not verify: ${error.message}`, "fail");
+    }
+  }
+
+  // The MeritSeal agent re-checks the receipt server-side. It receives the proof and commitment only.
+  async function askAgent(receipt) {
+    const el = $("zkAgent");
+    status(el, "Asking the MeritSeal agent…");
+    try {
+      const res = await fetch("/api/agent/check", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ proof: receipt.proof, public_signals: receipt.public_signals }) });
+      const body = await res.json();
+      if (!res.ok) return status(el, `Agent unavailable (${body.error ?? res.status}).`, "fail");
+      status(el, `MeritSeal agent: ${body.decision} · ${body.reason_code}. The agent saw only the proof and commitment, not the amount.`, body.decision === "APPROVE" ? "pass" : "fail");
+    } catch {
+      status(el, "Agent unreachable.", "fail");
     }
   }
 

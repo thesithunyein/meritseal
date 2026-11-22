@@ -99,3 +99,13 @@ test("proof relay is disabled without a Kurier key and reports health", async (t
   assert.equal(health.secretConfigured, true);
   assert.equal(health.attestationConfigured, false);
 });
+
+test("public agent check runs the ZK decision without the amount", async (t) => {
+  const base = await start(t);
+  const bad = await (await fetch(`${base}/api/agent/check`, { method: "POST", body: JSON.stringify({ proof: {}, public_signals: ["1"] }) })).json();
+  assert.equal(bad.decision, "REJECT");
+  assert.equal(bad.reason_code, "INVALID_RECEIPT");
+  const fake = await (await fetch(`${base}/api/agent/check`, { method: "POST", body: JSON.stringify(shapedReceipt) })).json();
+  assert.equal(fake.decision, "REJECT");
+  assert.equal(fake.policy_id, "nlnet-first-grant-amount:v1");
+});

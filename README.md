@@ -57,6 +57,8 @@ flowchart LR
 | `{ policy_id: "nlnet-first-grant-amount:v1", amount_eur }` | Plain range check (`AMOUNT_IN_RANGE` / `AMOUNT_OUT_OF_RANGE`) |
 | `{ policy: { rules }, application }` | Generic versioned rule evaluation (`equals`, `gte`, `lte`, `includes`, …) |
 
+Reviewers can watch it run without Agent Games credentials: `POST /api/agent/check` with a receipt returns the same decision, unsigned and rate-limited, and the live site calls it whenever a receipt is verified.
+
 It fails closed: malformed receipts → `INVALID_RECEIPT`; a missing verifier or key → `VERIFIER_UNAVAILABLE`; bad signatures → 401.
 
 ## Run locally

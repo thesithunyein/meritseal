@@ -2,8 +2,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { decide, loadVerifier, parseZkReceipt } from "./policy.mjs";
-import { jobStatus, kurierConfigured, submitProof } from "./kurier.mjs";
+import { decide, loadVerifier, NLNET_POLICY_ID, parseZkReceipt } from "./policy.mjs";
+import { jobStatus, kurierConfigured, submitProof, vkHash } from "./kurier.mjs";
 
 const secret = process.env.AGENT_GAMES_HMAC_SECRET ?? "";
 const port = Number(process.env.PORT ?? 3000);
@@ -91,6 +91,16 @@ async function attest(req, res) {
   }
 }
 
+// POST /api/agent/check: public demo of the agent's ZK decision (unsigned, rate-limited).
+// Reviewers can watch the agent approve a receipt without the amount ever being sent.
+async function agentCheck(req, res) {
+  if (rateLimited(req, 20)) return json(res, 429, { error: "rate_limited" });
+  let body;
+  try { body = JSON.parse(await rawBody(req)); } catch { return json(res, 400, { error: "invalid_json" }); }
+  const result = await decide({ input: { policy_id: NLNET_POLICY_ID, receipt: body?.receipt ?? body } });
+  return json(res, 200, { agent: "meritseal", policy_id: NLNET_POLICY_ID, ...result, checked_at: new Date().toISOString() });
+}
+
 async function attestStatus(res, jobId) {
   if (!kurierConfigured()) return json(res, 503, { error: "attestation_not_configured" });
   if (!/^[0-9a-f-]{8,64}$/i.test(jobId)) return json(res, 400, { error: "invalid_job_id" });
@@ -130,6 +140,7 @@ export function createAgentServer() {
         return json(res, 200, { ok: true, service: "meritseal-agent", secretConfigured: Boolean(secret), zkVerifierLoaded: Boolean(verifier), attestationConfigured: kurierConfigured() });
       }
       if (req.method === "POST" && path === "/api/attest") return await attest(req, res);
+      if (req.method === "POST" && path === "/api/agent/check") return await agentCheck(req, res);
       if (req.method === "GET" && path.startsWith("/api/attest/")) return await attestStatus(res, path.slice("/api/attest/".length));
       if (req.method === "POST" && (path === "/agent" || path === "/api/agent")) return await agentTask(req, res);
       return json(res, 404, { error: "not_found" });
@@ -141,4 +152,6 @@ export function createAgentServer() {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   createAgentServer().listen(port, () => console.log(`MeritSeal agent listening on ${port}`));
+  // Warm up: register the verification key with Kurier at boot so the first user doesn't wait.
+  if (kurierConfigured()) loadVerifier().then(v => v && vkHash(v.vkey)).catch(error => console.error(`[kurier] warm-up failed: ${error.message}`));
 }

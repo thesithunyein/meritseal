@@ -7,15 +7,25 @@ export const EXPLORER = process.env.ZKVERIFY_EXPLORER ?? "https://zkverify-testn
 
 export const kurierConfigured = () => Boolean(apiKey());
 
-async function call(path, init) {
-  const response = await fetch(`${apiUrl()}/${path}`, {
-    ...init,
-    headers: { "content-type": "application/json", ...(init?.headers ?? {}) },
-    signal: AbortSignal.timeout(15000)
-  });
+async function call(path, init, timeoutMs = 30000) {
+  const step = path.split("/")[0];
+  const started = Date.now();
+  let response;
+  try {
+    response = await fetch(`${apiUrl()}/${path}`, {
+      ...init,
+      headers: { "content-type": "application/json", ...(init?.headers ?? {}) },
+      signal: AbortSignal.timeout(timeoutMs)
+    });
+  } catch (error) {
+    console.error(`[kurier] ${step} failed after ${Date.now() - started}ms: ${error.name}: ${error.message}`);
+    throw new Error(`${step}_${error.name === "TimeoutError" ? "timeout" : "network"}`);
+  }
   const text = await response.text();
   let body = {};
   try { body = text ? JSON.parse(text) : {}; } catch { body = { raw: text.slice(0, 200) }; }
+  console.log(`[kurier] ${step} -> ${response.status} in ${Date.now() - started}ms`);
+  if (!response.ok) console.error(`[kurier] ${step} body: ${text.slice(0, 300)}`);
   return { ok: response.ok, status: response.status, body };
 }
 
@@ -27,9 +37,10 @@ export function vkHash(vkey) {
   vkHashPromise ??= call(`register-vk/${apiKey()}`, {
     method: "POST",
     body: JSON.stringify({ proofType: "groth16", proofOptions: PROOF_OPTIONS, vk: vkey })
-  }).then(({ body }) => {
+  }, 90000).then(({ status, body }) => {
     const hash = body.vkHash ?? body.meta?.vkHash;
-    if (!hash) throw new Error("vk_registration_failed");
+    if (!hash) throw new Error(`register-vk_${status}`);
+    console.log(`[kurier] vkHash ${hash}`);
     return hash;
   }).catch(error => { vkHashPromise = undefined; throw error; });
   return vkHashPromise;
