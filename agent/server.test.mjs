@@ -87,6 +87,9 @@ test("serves the app and the ZK script, nothing else", async (t) => {
   assert.equal(home.status, 200);
   assert.match(await home.text(), /id="zkForm"/);
   assert.equal((await fetch(`${base}/zk-receipt.js`)).status, 200);
+  const og = await fetch(`${base}/og.png`);
+  assert.equal(og.status, 200);
+  assert.equal(og.headers.get("content-type"), "image/png");
   assert.equal((await fetch(`${base}/package.json`)).status, 404);
   assert.equal((await fetch(`${base}/zk/../server.mjs`)).status, 404);
 });

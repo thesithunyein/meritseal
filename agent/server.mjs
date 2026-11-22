@@ -16,6 +16,7 @@ const STATIC = {
   "/": ["index.html", "text/html; charset=utf-8", "no-cache"],
   "/index.html": ["index.html", "text/html; charset=utf-8", "no-cache"],
   "/zk-receipt.js": ["zk-receipt.js", "text/javascript; charset=utf-8", "no-cache"],
+  "/og.png": ["og.png", "image/png", "public, max-age=86400"],
   "/zk/snarkjs.min.js": ["zk/snarkjs.min.js", "text/javascript; charset=utf-8", "public, max-age=3600"],
   "/zk/nlnet-amount.wasm": ["zk/nlnet-amount.wasm", "application/wasm", "public, max-age=3600"],
   "/zk/nlnet-amount.zkey": ["zk/nlnet-amount.zkey", "application/octet-stream", "public, max-age=3600"],
