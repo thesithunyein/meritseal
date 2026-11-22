@@ -9,7 +9,7 @@
   <a href="./docs/creator-walkthrough.md"><img src="https://img.shields.io/badge/Read-Technical%20walkthrough-475569" alt="Technical walkthrough"></a>
 </p>
 
-[![MeritSeal landing page](./docs/meritseal-home.png)](https://meritseal.vercel.app/)
+[![AI screening report: APPROVE, budget proven with zero knowledge and verified on zkVerify, each NLnet rule with evidence](./docs/screening-report.png)](https://meritseal.vercel.app/#screen)
 
 ## The problem
 
@@ -35,6 +35,8 @@ The model's output is constrained to the known rules and verdicts. Anything else
 **AI screening:** open [meritseal.vercel.app/#screen](https://meritseal.vercel.app/#screen), select **Load strong sample**, then **Screen application**. You get a rule-by-rule report, and the budget row links its zkVerify transaction. Expand "What the AI model saw" to confirm no amounts were sent. Then try **Load weak sample**: proprietary code, marketing spend, a €55,000 budget (no proof is possible) and an AI-written proposal.
 
 **Batch audit:** open [#audit](https://meritseal.vercel.app/#audit) and select **Generate demo round**. You see five valid receipts, one tampered receipt and one reused receipt, so 5/7 are within policy, and no amounts are shown.
+
+[![Batch audit: 5/7 receipts within policy, a tampered and a reused receipt rejected, no amounts shown](./docs/batch-audit.png)](https://meritseal.vercel.app/#audit)
 
 **ZK receipt only:**
 

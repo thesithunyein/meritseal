@@ -304,7 +304,7 @@ This application was generated with our own AI tool to show how powerful it is.`
     renderScreen(state);
     try {
       const made = await makeReceipt(raw);
-      if (made) { state.receipt = made.receipt; state.opening = made.opening; } else state.budgetFailed = true;
+      if (made) { state.receipt = made.receipt; state.opening = made.opening; current = made; } else state.budgetFailed = true;
       renderScreen(state);
       status(out, "Budget handled privately. The AI agent is reading the application…");
       const res = await fetch("/api/screen", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ application_text: redacted, receipt: made ? { proof: made.receipt.proof, public_signals: made.receipt.public_signals } : undefined }) });
