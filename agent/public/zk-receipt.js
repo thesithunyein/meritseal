@@ -308,6 +308,15 @@ This application was generated with our own AI tool to show how powerful it is.`
     card.append(el("h3", {}, ok ? "Ready to submit" : `Fix ${todo} thing${todo === 1 ? "" : "s"} before you submit`),
       el("p", {}, `${passes.length} of ${checks.length} checks passed.${ok ? " Your application meets every published requirement we check." : " Start with the items below."}`));
     panel.append(card);
+    // The budget proof's public record stays visible even when the passing checks are folded away.
+    if (state.receipt) {
+      const z = state.receipt.zkverify, url = safeExplorer(z?.explorer_url);
+      const line = el("p", { class: "proof-line" });
+      line.append(el("span", { class: "dot", "aria-hidden": "true" }, "🔒"), "Budget proven in range on this device. Public record: ");
+      if (url) line.append(el("a", { href: url, target: "_blank", rel: "noopener" }, `${RECORD_TEXT[z.status] ?? z.status} · view on zkVerify`));
+      else line.append(z?.status && /^Relay/.test(z.status) ? "not recorded yet" : RECORD_TEXT[z?.status] ?? "Sending…");
+      panel.append(line);
+    }
     if (r.assessment.project_summary) panel.append(el("p", { class: "hint" }, `The AI understood your project as: ${r.assessment.project_summary}`));
 
     const ruleItem = (c) => {
@@ -334,7 +343,7 @@ This application was generated with our own AI tool to show how powerful it is.`
     };
     group(`Fix these first (${fails.length})`, fails);
     group(`Add more detail (${infos.length})`, infos);
-    group(`Already good (${passes.length})`, passes, ok);
+    group(`Already good (${passes.length})`, passes, false);
     if (r.assessment.suggestion) panel.append(el("p", { class: "tip" }, `Suggestion: ${r.assessment.suggestion}`));
 
     const actions = el("div", { class: "row" });
