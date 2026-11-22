@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://meritseal.vercel.app/#screen"><img src="https://img.shields.io/badge/Live-Check%20an%20application-283A8C" alt="Check an application"></a>
   <a href="https://meritseal.vercel.app/#audit"><img src="https://img.shields.io/badge/Live-Audit%20a%20round-16715B" alt="Audit a round"></a>
-  <img src="https://img.shields.io/badge/tests-15%20passing-16715B" alt="15 tests passing">
+  <img src="https://img.shields.io/badge/tests-16%20passing-16715B" alt="16 tests passing">
   <img src="https://img.shields.io/badge/license-MIT-475569" alt="MIT license">
 </p>
 
@@ -19,10 +19,11 @@ Built for the **zkVerify Agent Games, Wildcard track**. Live: **https://meritsea
 | Wildcard criterion | Where to see it |
 | --- | --- |
 | **Useful problem** | [The problem](#the-problem): applicants need a pre-check against the funder's rules, and grant programs need to show compliance without publishing budgets. |
-| **Working implementation** | Live at [meritseal.vercel.app/#screen](https://meritseal.vercel.app/#screen). Select **Use a strong example**, then **Check my application** (about 30 s). The agent code is in [`agent/`](./agent), and [14 automated tests](#tests) cover it. |
+| **Working implementation** | Live at [meritseal.vercel.app/#screen](https://meritseal.vercel.app/#screen). Select **Strong example**: it fills in a sample application and runs the check (about 15 s). The agent code is in [`agent/`](./agent), and [16 automated tests](#tests) cover it. |
 | **Clear explanation** | [What the agent does](#what-the-agent-does), [what it can and cannot do](#what-it-can-and-cannot-do), [how it works](#how-it-works), [key design decisions](#key-design-decisions) and [limitations](#limitations). |
 | **Verifiability (zkVerify)** | Each budget proof is a Groth16 proof verified on zkVerify Volta through Kurier. Example finalized transaction: [`0x8cbc2d54…16ba7afc`](https://zkverify-testnet.subscan.io/extrinsic/0x8cbc2d54acf347b4f44f8878197930d841bfad845a6b0c3666d6941616ba7afc). The circuit is [`proof/nlnet-amount.circom`](./proof/nlnet-amount.circom), and the key manifest is at [`/zk/manifest.json`](https://meritseal.vercel.app/zk/manifest.json). |
-| **Public endpoint** | `POST https://meritseal.vercel.app/api/screen` (AI screening) and `POST /api/agent` (Agent Games, HMAC-signed). See [Agent API](#agent-api). |
+| **Public endpoint** | `POST https://meritseal.vercel.app/api/screen` (AI screening) and `POST /api/agent` (Agent Games, HMAC-signed). Opening either URL in a browser returns its usage. See [Agent API](#agent-api). |
+| **Public share (bonus)** | [Launch post](https://x.com/thesithunyein/status/2124376805994102840), [Part 1 article](https://x.com/thesithunyein/status/2123797328322781412) and [Part 2 article](https://x.com/thesithunyein/status/2124391654182535274) on X. |
 
 ## The problem
 
@@ -38,8 +39,8 @@ MeritSeal handles both. It starts with [NLnet](https://nlnet.nl/propose/), a Eur
 
 ## Try it in two minutes
 
-1. **Check an application.** Open [meritseal.vercel.app/#screen](https://meritseal.vercel.app/#screen), select **Use a strong example**, then **Check my application**. You see four progress steps, then a report: *Ready to submit*, 8 of 8 checks passed, each with the quote it relied on, and a public zkVerify record for the budget proof. Open **What the AI saw** to confirm every amount was replaced with `[AMOUNT]`.
-2. **Try a weak application.** Select **Use a weak example** and check again. It asks for fixes: the budget is above €50,000 (no proof can be made), the code is proprietary, the work is marketing rather than technical development, there is no budget breakdown or European dimension, and the text says it was AI-generated.
+1. **Check an application.** Open [meritseal.vercel.app/#screen](https://meritseal.vercel.app/#screen), select **Strong example** (it fills in a sample application and runs the check). You see four progress steps, then a report: *Ready to submit*, 8 of 8 checks passed, each with the quote it relied on, and a public zkVerify record for the budget proof. Open **What the AI saw** to confirm every amount was replaced with `[AMOUNT]`.
+2. **Try a weak application.** Select **Weak example**. It asks for fixes: the budget is above €50,000 (no proof can be made), the code is proprietary, the work is marketing rather than technical development, there is no budget breakdown or European dimension, and the text says it was AI-generated.
 3. **Audit a round.** Open [#audit](https://meritseal.vercel.app/#audit) and select **Create an example round**. It reports *5 of 7 within the budget rule*: one altered proof and one reused proof are caught, and only anonymous IDs are shown.
 
 [![Batch audit: 5 of 7 proofs within the budget rule, an altered and a reused proof rejected, no amounts shown](./docs/batch-audit.png)](https://meritseal.vercel.app/#audit)
@@ -107,6 +108,7 @@ flowchart LR
 | `POST /api/attest`, `GET /api/attest/:job` | `{ proof, public_signals }` | zkVerify job id, then status and transaction hash |
 | `GET /api/screen/rules` | none | The seven rules, with NLnet's wording |
 | `GET /api/health` | none | Which components are configured |
+| `GET` on any endpoint above | none | A short description of how to call it |
 
 It fails closed: malformed proofs return `INVALID_RECEIPT`, a missing verifier returns `VERIFIER_UNAVAILABLE`, a model outage returns `SCREENING_UNAVAILABLE`, and a bad signature returns 401.
 
@@ -121,14 +123,14 @@ It fails closed: malformed proofs return `INVALID_RECEIPT`, a missing verifier r
 
 ## Tests
 
-`npm test` runs 15 tests ([`agent/server.test.mjs`](./agent/server.test.mjs)), including:
+`npm test` runs 16 tests ([`agent/server.test.mjs`](./agent/server.test.mjs)), including:
 - **the AI model never receives budget amounts**: the request sent to Gemini is inspected, and `24,000`, `8,400` and `€60` must not appear;
 - model output is constrained to known rules and verdicts (an injected rule or an unknown verdict is ignored);
 - the agent approves only with all rules passed **and** a valid budget proof;
 - Agent Games HMAC signing, preflight, idempotency, and rejection of malformed or unsigned requests;
 - malformed proofs are rejected and the agent fails closed without a verifier;
 - Gemini is retried once on a timeout, 429 or 5xx;
-- only whitelisted files are served.
+- only whitelisted files are served, and a browser visit to an endpoint returns its usage.
 
 `npm run zk:check` proves €5,000, €12,000 and €50,000, confirms €4,999, €50,001 and €70,000 cannot be proven, and confirms a changed commitment fails verification.
 
@@ -155,7 +157,7 @@ agent/
   screen.mjs          AI screening: NLnet rules, amount redaction, Gemini call, output validation
   policy.mjs          Decisions: screening + budget proof, proof verification, legacy rule checks
   kurier.mjs          zkVerify submission through Kurier (register key, submit, status)
-  server.test.mjs     15 tests
+  server.test.mjs     16 tests
   public/index.html   The web app (applicant flow, audit, budget proof)
   public/zk-receipt.js  Browser logic: redaction, proving, report, audit
   public/zk/          Circuit WASM, proving key, verification key, manifest
@@ -173,6 +175,12 @@ proof/
 - **Commitment binding.** A proof shows the *committed* budget is in range. Linking it to the budget in the final application is done with the applicant's secret file, if the funder asks.
 - **Testnet.** zkVerify submissions use the Volta testnet.
 - **Model data.** On Google's free tier, prompts may be used to improve Google's models. Amounts are removed first, but real deployments should use a paid key.
+
+## Written up in public
+
+- [Part 1: What can a private grant receipt actually prove?](https://x.com/thesithunyein/status/2123797328322781412) shows why a checksum receipt was not enough.
+- [Part 2: Can an AI agent prove what it tells you?](https://x.com/thesithunyein/status/2124391654182535274) covers the zero-knowledge proofs, zkVerify and the AI agent.
+- [Technical walkthrough](./docs/creator-walkthrough.md)
 
 ## Project policies
 

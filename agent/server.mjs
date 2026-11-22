@@ -23,6 +23,13 @@ const STATIC = {
   "/zk/manifest.json": ["zk/manifest.json", "application/json; charset=utf-8", "public, max-age=300"]
 };
 
+const ENDPOINT_HELP = {
+  "/api/screen": { endpoint: "POST /api/screen", agent: "meritseal", description: "AI screening of a grant application against NLnet's published rules. Amounts are removed before the model sees the text; the budget rule is satisfied only by a Groth16 proof verified on zkVerify.", body: { application_text: "string (amounts are redacted server-side too)", receipt: "optional { proof, public_signals } budget proof from the browser" }, returns: "decision (APPROVE | REJECT), reason_code, assessment.rules[] with verdict, evidence and reason", try_in_browser: "https://meritseal.vercel.app/#screen", rules: "GET /api/screen/rules" },
+  "/api/agent": { endpoint: "POST /api/agent", description: "Agent Games task endpoint. Requests and responses are HMAC-SHA256 signed (x-agent-games-signature); task_id is an idempotency key.", inputs: ["{ task_id, input: { application_text, receipt? } }", "{ task_id, input: { policy_id: \"nlnet-first-grant-amount:v1\", receipt } }"], public_alternative: "POST /api/screen or POST /api/agent/check" },
+  "/api/agent/check": { endpoint: "POST /api/agent/check", description: "The agent's decision on a budget proof alone (no amount is sent).", body: { proof: "Groth16 proof", public_signals: ["commitment"] }, returns: "APPROVE / ZK_PROOF_VALID or REJECT" },
+  "/api/attest": { endpoint: "POST /api/attest", description: "Re-verifies a budget proof and submits it to zkVerify through Kurier.", body: { proof: "Groth16 proof", public_signals: ["commitment"] }, returns: "job_id; then GET /api/attest/:job_id for status and tx_hash" }
+};
+
 const sign = (raw) => createHmac("sha256", secret).update(raw).digest("hex");
 function validSignature(raw, supplied = "") {
   const got = supplied.replace(/^sha256=/i, "").trim().toLowerCase(), expected = sign(raw);
@@ -160,6 +167,8 @@ export function createAgentServer() {
       if (req.method === "POST" && path === "/api/attest") return await attest(req, res);
       if (req.method === "POST" && path === "/api/agent/check") return await agentCheck(req, res);
       if (req.method === "POST" && path === "/api/screen") return await screen(req, res);
+      // A browser visit to an endpoint explains how to call it, instead of a bare 404.
+      if (req.method === "GET" && (path === "/api/screen" || path === "/api/agent" || path === "/api/agent/check" || path === "/api/attest")) return json(res, 200, ENDPOINT_HELP[path]);
       if (req.method === "GET" && path === "/api/screen/rules") return json(res, 200, { policy_id: NLNET_POLICY_ID, model: geminiModel(), rules: SCREENING_RULES });
       if (req.method === "GET" && path.startsWith("/api/attest/")) return await attestStatus(res, path.slice("/api/attest/".length));
       if (req.method === "POST" && (path === "/agent" || path === "/api/agent")) return await agentTask(req, res);

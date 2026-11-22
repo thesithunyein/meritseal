@@ -174,3 +174,12 @@ test("Gemini is retried once on a 503 and the result is used", async () => {
   assert.equal(calls, 2);
   assert.equal(result.rules.length, 7);
 });
+
+test("opening an endpoint in a browser explains how to use it", async (t) => {
+  const base = await start(t);
+  for (const path of ["/api/screen", "/api/agent", "/api/agent/check", "/api/attest"]) {
+    const res = await fetch(`${base}${path}`);
+    assert.equal(res.status, 200, path);
+    assert.match((await res.json()).endpoint, /^POST /);
+  }
+});

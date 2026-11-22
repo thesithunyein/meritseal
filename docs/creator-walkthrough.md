@@ -4,7 +4,7 @@ MeritSeal is an AI agent that checks a grant application against NLnet's publish
 
 ## 1. The applicant pastes a proposal
 
-On [#screen](https://meritseal.vercel.app/#screen), select **Use a strong example**, then **Check my application**. The text includes a budget breakdown with amounts such as "140 hours at €60/hour = €8,400". The total budget (€24,000) goes in a separate field.
+On [#screen](https://meritseal.vercel.app/#screen), select **Strong example**. The text includes a budget breakdown with amounts such as "140 hours at €60/hour = €8,400". The total budget (€24,000) goes in a separate field.
 
 Before anything is sent, the browser replaces every amount in the text with `[AMOUNT]` (`redactAmounts` in [`agent/public/zk-receipt.js`](../agent/public/zk-receipt.js)). The server repeats the same redaction ([`agent/screen.mjs`](../agent/screen.mjs)). Standard identifiers such as `RFC 4791` are kept, because the open-standards rule needs them. In the report, **What the AI saw** shows the exact text the model received.
 
@@ -16,7 +16,7 @@ The browser builds a Groth16 proof with the circuit [`proof/nlnet-amount.circom`
 - constraints: `amount` fits in 16 bits, `5000 ≤ amount ≤ 50000`
 - public output: `commitment = Poseidon(1, amount, salt)`
 
-If the amount is out of range (try **Use a weak example**, €55,000), no witness exists, so no proof can be made and nothing is sent. The applicant can save a secret file (amount and salt) to later show a funder that the commitment matches the real budget.
+If the amount is out of range (try **Weak example**, €55,000), no witness exists, so no proof can be made and nothing is sent. The applicant can save a secret file (amount and salt) to later show a funder that the commitment matches the real budget.
 
 ## 3. The agent reads the application
 
