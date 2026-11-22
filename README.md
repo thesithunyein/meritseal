@@ -1,57 +1,73 @@
 <p align="center"><img src="./docs/meritseal-shield.svg" width="82" height="82" alt="MeritSeal shield"></p>
 
 <h1 align="center">MeritSeal</h1>
-<p align="center">An AI agent that screens grant applications against the funder&rsquo;s rules, while the budget is proven with zero knowledge and never seen.</p>
+<p align="center"><b>An AI agent that checks grant applications against the funder's published rules, while the applicant's budget stays private.</b><br>The budget is proven in range with a zero-knowledge proof and verified on zkVerify. The agent and the AI model never see it.</p>
 
 <p align="center">
-  <a href="https://meritseal.vercel.app/#screen"><img src="https://img.shields.io/badge/Live-Screen%20an%20application-283A8C" alt="Screen an application"></a>
+  <a href="https://meritseal.vercel.app/#screen"><img src="https://img.shields.io/badge/Live-Check%20an%20application-283A8C" alt="Check an application"></a>
   <a href="https://meritseal.vercel.app/#audit"><img src="https://img.shields.io/badge/Live-Audit%20a%20round-16715B" alt="Audit a round"></a>
-  <a href="./docs/creator-walkthrough.md"><img src="https://img.shields.io/badge/Read-Technical%20walkthrough-475569" alt="Technical walkthrough"></a>
+  <img src="https://img.shields.io/badge/tests-14%20passing-16715B" alt="14 tests passing">
+  <img src="https://img.shields.io/badge/license-MIT-475569" alt="MIT license">
 </p>
 
-[![AI screening report: APPROVE, budget proven with zero knowledge and verified on zkVerify, each NLnet rule with evidence](./docs/screening-report.png)](https://meritseal.vercel.app/#screen)
+[![AI screening report: ready to submit, budget proven with zero knowledge and recorded on zkVerify, each NLnet rule with evidence](./docs/screening-report.png)](https://meritseal.vercel.app/#screen)
+
+Built for the **zkVerify Agent Games, Wildcard track**. Live: **https://meritseal.vercel.app**. No wallet or crypto is needed to use it.
+
+## For reviewers: where to find each criterion
+
+| Wildcard criterion | Where to see it |
+| --- | --- |
+| **Useful problem** | [The problem](#the-problem): applicants need a pre-check against the funder's rules, and grant programs need to show compliance without publishing budgets. |
+| **Working implementation** | Live at [meritseal.vercel.app/#screen](https://meritseal.vercel.app/#screen). Select **Use a strong example**, then **Check my application** (about 30 s). The agent code is in [`agent/`](./agent), and [14 automated tests](#tests) cover it. |
+| **Clear explanation** | [What the agent does](#what-the-agent-does), [what it can and cannot do](#what-it-can-and-cannot-do), [how it works](#how-it-works) and [limitations](#limitations). |
+| **Verifiability (zkVerify)** | Each budget proof is a Groth16 proof verified on zkVerify Volta through Kurier. Example finalized transaction: [`0x8cbc2d54…16ba7afc`](https://zkverify-testnet.subscan.io/extrinsic/0x8cbc2d54acf347b4f44f8878197930d841bfad845a6b0c3666d6941616ba7afc). The circuit is [`proof/nlnet-amount.circom`](./proof/nlnet-amount.circom), and the key manifest is at [`/zk/manifest.json`](https://meritseal.vercel.app/zk/manifest.json). |
+| **Public endpoint** | `POST https://meritseal.vercel.app/api/screen` (AI screening) and `POST /api/agent` (Agent Games, HMAC-signed). See [Agent API](#agent-api). |
 
 ## The problem
 
-Grant programs (foundations, DAOs, public-goods funds) are asked to show that every request and award follows their published rules. The obvious way to show that is to publish each budget, but grantees often can't do that: budgets reveal salaries, rates and runway. Today programs pick one side: they publish everything, or they ask the public to trust them.
+Grant applicants, often individual open-source developers, send proposals that get rejected for avoidable reasons: no open licence, no budget breakdown, a budget outside the allowed range. Funders publish their rules, but nobody checks an application against them before it is sent.
 
-MeritSeal lets an applicant **prove** a rule holds without disclosing the number. The first rule is NLnet's published first-grant range: the requested amount must be €5,000–€50,000 ([NLnet application form](https://nlnet.nl/propose/)).
+Grant programs face the opposite problem. They are asked to show that every request in a round followed their rules. The obvious way to prove that is to publish each budget, but budgets reveal salaries, rates and runway, so programs either publish everything or ask the public to trust them.
 
-**Who it helps:**
-- **Applicants** get an AI pre-screen of their proposal against the funder's published requirements before they submit. The budget is proven in range with zero knowledge, so neither the agent nor the AI model sees it.
-- **Grant programs and auditors** check a whole round's receipts and confirm each one is in policy, without seeing any amounts.
+MeritSeal handles both. It starts with [NLnet](https://nlnet.nl/propose/), a European fund for open-source technology with clear published requirements.
+
+**Who it helps**
+- **Applicants**: get a rule-by-rule report with evidence and a suggestion before submitting. Their budget is proven to be in range without being disclosed.
+- **Grant programs and auditors**: check a whole round's budget proofs and show "N of N within the rule" without seeing any amount.
+
+## Try it in two minutes
+
+1. **Check an application.** Open [meritseal.vercel.app/#screen](https://meritseal.vercel.app/#screen), select **Use a strong example**, then **Check my application**. You see four progress steps, then a report: *Ready to submit*, 8 of 8 checks passed, each with the quote it relied on, and a public zkVerify record for the budget proof. Open **What the AI saw** to confirm every amount was replaced with `[AMOUNT]`.
+2. **Try a weak application.** Select **Use a weak example** and check again. It asks for fixes: the budget is above €50,000 (no proof can be made), the code is proprietary, the work is marketing rather than technical development, there is no budget breakdown or European dimension, and the text says it was AI-generated.
+3. **Audit a round.** Open [#audit](https://meritseal.vercel.app/#audit) and select **Create an example round**. It reports *5 of 7 within the budget rule*: one altered proof and one reused proof are caught, and only anonymous IDs are shown.
+
+[![Batch audit: 5 of 7 proofs within the budget rule, an altered and a reused proof rejected, no amounts shown](./docs/batch-audit.png)](https://meritseal.vercel.app/#audit)
 
 ## What the agent does
 
-1. **Reads** the application. The browser first replaces every amount with `[AMOUNT]`, and the server does the same again.
-2. **Checks** it against NLnet's published requirements ([nlnet.nl/propose](https://nlnet.nl/propose/)) with Gemini: technical development, open licence, open standards, budget breakdown (structure, not numbers), European dimension, human authorship with AI use disclosed, and plain English. Each rule gets a verdict (PASS, NEEDS_INFO or FAIL), a quote from the application as evidence, and a reason.
-3. **Proves** the one rule that needs the secret number: the budget is within €5,000–€50,000. The browser builds a Groth16 proof and the server submits it to zkVerify.
-4. **Decides**: it returns `APPROVE / SCREEN_PASSED` only when every rule passes *and* the budget proof is valid, otherwise `REJECT` with the reason. It then suggests one concrete improvement.
+1. **Removes amounts.** The browser replaces every amount in the application with `[AMOUNT]` before sending it, and the server does it again. Standard identifiers such as `RFC 4791` are kept.
+2. **Proves the budget privately.** The browser creates a Groth16 proof that the budget is between €5,000 and €50,000. A budget outside the range cannot produce a proof.
+3. **Reads and judges.** Gemini checks seven requirements published on [nlnet.nl/propose](https://nlnet.nl/propose/): technical development, open licence, open standards, budget breakdown (structure, not numbers), European dimension, written by a human, and plain English. Each rule gets PASS, NEEDS_INFO or FAIL, plus a quote from the application and a reason.
+4. **Decides.** It returns `APPROVE / SCREEN_PASSED` only if all seven rules pass **and** the budget proof verifies. Otherwise it returns `REJECT` with the reason (`SCREEN_NEEDS_WORK`, `SCREEN_NOT_READY` or `BUDGET_PROOF_MISSING`) and one concrete suggestion.
+5. **Records the proof publicly.** The budget proof is submitted to zkVerify, so a funder or auditor can confirm it later.
 
-The model's output is constrained to the known rules and verdicts. Anything else becomes NEEDS_INFO. Text inside the application is treated as data, not instructions. The AI's verdicts are advisory; NLnet decides eligibility.
+## What it can and cannot do
 
-## Try it in under a minute
-
-**AI screening:** open [meritseal.vercel.app/#screen](https://meritseal.vercel.app/#screen), select **Load strong sample**, then **Screen application**. You get a rule-by-rule report, and the budget row links its zkVerify transaction. Expand "What the AI model saw" to confirm no amounts were sent. Then try **Load weak sample**: proprietary code, marketing spend, a €55,000 budget (no proof is possible) and an AI-written proposal.
-
-**Batch audit:** open [#audit](https://meritseal.vercel.app/#audit) and select **Generate demo round**. You see five valid receipts, one tampered receipt and one reused receipt, so 5/7 are within policy, and no amounts are shown.
-
-[![Batch audit: 5/7 receipts within policy, a tampered and a reused receipt rejected, no amounts shown](./docs/batch-audit.png)](https://meritseal.vercel.app/#audit)
-
-**ZK receipt only:**
-
-1. Open **[meritseal.vercel.app/#zk](https://meritseal.vercel.app/#zk)** and select **Try €12,000**. Your browser generates a Groth16 proof (a few seconds). The amount is never sent anywhere.
-2. The receipt shows the policy, a Poseidon commitment and the proof, then the zkVerify status as the proof is verified on-chain (Queued → … → Finalized, with a Subscan link).
-3. Select **Copy receipt link** and open it in another browser. The proof is verified there against the published key, and the amount appears nowhere.
-4. Select **Try €55,000**. No proof can be generated, because the circuit rejects out-of-range amounts.
-5. Edit any digit of the proof or commitment in **Check a receipt** → **Invalid**.
+| It can | It cannot |
+| --- | --- |
+| Check an application against seven of NLnet's published requirements and quote its evidence | Decide eligibility: NLnet decides, and the report is advisory |
+| Prove the budget is within €5,000–€50,000 without revealing it | Judge the merit or quality of a proposal |
+| Record each budget proof on zkVerify for later checking | Guarantee the AI is right: each verdict shows its quote so a person can check it |
+| Let an auditor check many proofs at once and catch altered or reused ones | Prove that a committed budget equals the one in the final application: the applicant's secret file does that, if the funder asks |
+| Run without a wallet, account or crypto | Screen against funders other than NLnet yet: the rules are data in [`agent/screen.mjs`](./agent/screen.mjs), so adding a funder means adding a rule list |
 
 ## How it works
 
 ```mermaid
 flowchart LR
     subgraph Browser["Applicant's browser"]
-        T["Application text"] --> X["Redact amounts → [AMOUNT]"]
+        T["Application text"] --> X["Remove amounts → [AMOUNT]"]
         A["Budget + random salt"] --> P["Groth16 prover<br/>5,000 ≤ budget ≤ 50,000<br/>commitment = Poseidon(1, budget, salt)"]
     end
     X -->|"text without amounts"| S["/api/screen<br/>MeritSeal agent"]
@@ -62,28 +78,48 @@ flowchart LR
     V --> D
     D -->|"APPROVE / REJECT + report"| Browser
     P -->|"proof + commitment"| R["/api/attest"] --> K["Kurier"] --> Z["zkVerify Volta<br/>on-chain verification"]
-    P --> AU["Batch audit<br/>N/N in policy, no amounts"]
+    P --> AU["Batch audit<br/>N of N within the rule, no amounts"]
 ```
 
-- **Circuit** (`proof/nlnet-amount.circom`): private `amount` and `salt`; public output `commitment`. It constrains the amount to 16 bits, then `5000 ≤ amount ≤ 50000`. The commitment lets the applicant later open the exact amount to the funder (the "private opening" file) while nobody else learns it.
-- **Receipt** (`meritseal.zk-receipt.v2`): `policy_id`, `commitment`, `proof`, `public_signals`, `vkey_sha256`, `issued_at`, and zkVerify `job_id` / `tx_hash`. The "in range" result comes from the proof itself. No field of the receipt is trusted text.
-- **zkVerify**: the server re-verifies each proof locally (so junk never reaches the relay), registers the verification key once, submits via Kurier, and returns the job status and transaction hash.
-- **Key transparency**: `/zk/manifest.json` publishes the circuit, the verification-key SHA-256 and how the key was generated. Receipts made under a different key are rejected.
+- **Circuit** ([`proof/nlnet-amount.circom`](./proof/nlnet-amount.circom)): private `amount` and `salt`, public output `commitment = Poseidon(1, amount, salt)`. The amount is constrained to 16 bits, then to `5000 ≤ amount ≤ 50000`.
+- **Budget proof** (`meritseal.zk-receipt.v2`): `policy_id`, `commitment`, `proof`, `public_signals`, `vkey_sha256`, `issued_at` and zkVerify `job_id` / `tx_hash`. The "in range" result comes from the proof itself, not from any text field.
+- **zkVerify**: the server re-verifies each proof before relaying it (so junk never reaches the chain), registers the verification key once at boot, submits through [Kurier](https://docs.zkverify.io/overview/getting-started/kurier) and polls the job until it is finalized.
+- **AI safety**: the model's output is constrained to the seven known rule IDs and three verdicts; anything else becomes NEEDS_INFO. Text in the application is treated as data, not instructions. All model output is rendered with `textContent`, never as HTML.
+- **Key transparency**: [`/zk/manifest.json`](https://meritseal.vercel.app/zk/manifest.json) publishes the circuit, the verification-key SHA-256 and how the key was generated. Proofs made under a different key are rejected.
 
-## The agent
+## Agent API
 
-`POST /api/agent` is an [Agent Games](https://agentgames.zkverify.io) endpoint: HMAC-signed requests and responses, idempotent task IDs, deadline handling and preflight.
+| Endpoint | Input | Output |
+| --- | --- | --- |
+| `POST /api/screen` | `{ application_text, receipt? }` | `decision`, `reason_code`, rule-by-rule `assessment`, `budget` check. Public and rate-limited. |
+| `POST /api/agent` | Agent Games signed task: `{ task_id, input: { application_text, receipt? } }` or `{ input: { policy_id: "nlnet-first-grant-amount:v1", receipt } }` | HMAC-signed decision; idempotent on `task_id`; preflight supported |
+| `POST /api/agent/check` | `{ proof, public_signals }` | The agent's decision on a budget proof (`APPROVE / ZK_PROOF_VALID`). Public. |
+| `POST /api/attest`, `GET /api/attest/:job` | `{ proof, public_signals }` | zkVerify job id, then status and transaction hash |
+| `GET /api/screen/rules` | none | The seven rules, with NLnet's wording |
+| `GET /api/health` | none | Which components are configured |
 
-| Task input | Decision |
+It fails closed: malformed proofs return `INVALID_RECEIPT`, a missing verifier returns `VERIFIER_UNAVAILABLE`, a model outage returns `SCREENING_UNAVAILABLE`, and a bad signature returns 401.
+
+## Privacy: what leaves the device
+
+| Data | Where it goes |
 | --- | --- |
-| `{ application_text, receipt? }` | AI screening against NLnet's rules plus the ZK budget proof. Returns `APPROVE / SCREEN_PASSED` or `REJECT` with `SCREEN_NEEDS_WORK`, `SCREEN_NOT_READY` or `BUDGET_PROOF_MISSING`, and the full rule-by-rule assessment |
-| `{ policy_id: "nlnet-first-grant-amount:v1", receipt: { proof, public_signals } }` | Verifies the Groth16 proof and returns `APPROVE / ZK_PROOF_VALID` plus the commitment. **It never sees the amount.** |
-| `{ policy_id: "nlnet-first-grant-amount:v1", amount_eur }` | Plain range check (`AMOUNT_IN_RANGE` / `AMOUNT_OUT_OF_RANGE`) |
-| `{ policy: { rules }, application }` | Generic versioned rule evaluation (`equals`, `gte`, `lte`, `includes`, …) |
+| Budget amount | Nowhere. Only the proof and an anonymous commitment are sent. |
+| Application text | To the MeritSeal server and Google Gemini, **with amounts removed**. It is not stored. The report shows exactly what the AI saw. |
+| Budget proof | To zkVerify (public), so it can be checked later |
+| Secret file (amount + salt) | Only to the applicant's own downloads, if they choose to save it |
 
-Reviewers can watch it run without Agent Games credentials: `POST /api/agent/check` with a receipt returns the same decision, unsigned and rate-limited, and the live site calls it whenever a receipt is verified.
+## Tests
 
-It fails closed: malformed receipts → `INVALID_RECEIPT`; a missing verifier or key → `VERIFIER_UNAVAILABLE`; bad signatures → 401.
+`npm test` runs 14 tests ([`agent/server.test.mjs`](./agent/server.test.mjs)), including:
+- **the AI model never receives budget amounts**: the request sent to Gemini is inspected, and `24,000`, `8,400` and `€60` must not appear;
+- model output is constrained to known rules and verdicts (an injected rule or an unknown verdict is ignored);
+- the agent approves only with all rules passed **and** a valid budget proof;
+- Agent Games HMAC signing, preflight, idempotency, and rejection of malformed or unsigned requests;
+- malformed proofs are rejected and the agent fails closed without a verifier;
+- only whitelisted files are served.
+
+`npm run zk:check` proves €5,000, €12,000 and €50,000, confirms €4,999, €50,001 and €70,000 cannot be proven, and confirms a changed commitment fails verification.
 
 ## Run locally
 
@@ -91,22 +127,41 @@ Requires Node 20+ and [circom 2.1.6+](https://docs.circom.io/getting-started/ins
 
 ```bash
 npm install
-npm run zk:setup      # compile circuit, Groth16 setup, write agent/public/zk/*
-npm run zk:check      # €5,000/€12,000/€50,000 prove & verify; €4,999/€50,001/€70,000 cannot prove; tampering rejected
-npm test              # agent, signing, receipt handling, static serving
-cp .env.example .env  # KURIER_API_KEY, GEMINI_API_KEY, optional AGENT_GAMES_HMAC_SECRET
+npm run zk:setup      # compile the circuit, run the Groth16 setup, write agent/public/zk/*
+npm run zk:check      # boundary proofs (see Tests)
+npm test
+cp .env.example .env  # GEMINI_API_KEY, KURIER_API_KEY, optional AGENT_GAMES_HMAC_SECRET
 npm start             # http://localhost:3000
 ```
 
-Deployed as a container (`Dockerfile`). Health: `GET /api/health` reports `secretConfigured`, `zkVerifierLoaded` and `attestationConfigured`.
+Deployed on Vercel as a container ([`Dockerfile`](./Dockerfile)).
+
+## Repository map
+
+```
+agent/
+  server.mjs          HTTP server: routes, Agent Games HMAC signing, rate limits, static files
+  screen.mjs          AI screening: NLnet rules, amount redaction, Gemini call, output validation
+  policy.mjs          Decisions: screening + budget proof, proof verification, legacy rule checks
+  kurier.mjs          zkVerify submission through Kurier (register key, submit, status)
+  server.test.mjs     14 tests
+  public/index.html   The web app (applicant flow, audit, budget proof)
+  public/zk-receipt.js  Browser logic: redaction, proving, report, audit
+  public/zk/          Circuit WASM, proving key, verification key, manifest
+proof/
+  nlnet-amount.circom The budget range circuit
+  setup.mjs           Builds the key and browser artifacts
+  verify-boundaries.mjs  Boundary and tamper checks
+```
 
 ## Limitations
 
-- One criterion only. NLnet decides eligibility and awards. MeritSeal proves the amount rule, not the merit of a proposal.
-- The Groth16 key comes from a single-party setup (details in `/zk/manifest.json`). A production deployment should run a multi-party phase-2 ceremony.
-- A receipt proves the *committed* amount is in range. Binding that commitment to the amount in the actual application is the funder's step, done with the private opening.
-- zkVerify submission uses the Volta testnet.
-- The screening uses Gemini; on Google's free tier, prompts may be used to improve Google's models. Amounts are removed first, but deploy with a paid key for real applications. Seven rules are checked from NLnet's public page, and the AI can be wrong, so treat its report as a pre-check.
+- **One funder.** The seven rules come from NLnet's public page. Other funders need their own rule list.
+- **Advisory AI.** The AI can misread a proposal. Each verdict shows its quote so a person can check it. NLnet makes its own decisions.
+- **Single-party key setup.** The Groth16 key was generated by one person (see [`/zk/manifest.json`](https://meritseal.vercel.app/zk/manifest.json)). Production use should run a multi-party ceremony.
+- **Commitment binding.** A proof shows the *committed* budget is in range. Linking it to the budget in the final application is done with the applicant's secret file, if the funder asks.
+- **Testnet.** zkVerify submissions use the Volta testnet.
+- **Model data.** On Google's free tier, prompts may be used to improve Google's models. Amounts are removed first, but real deployments should use a paid key.
 
 ## Project policies
 

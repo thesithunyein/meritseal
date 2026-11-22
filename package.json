@@ -1,8 +1,25 @@
 {
   "name": "meritseal-agent",
-  "version": "0.2.0",
+  "version": "0.3.0",
+  "description": "AI agent that checks grant applications against NLnet's published rules while proving the budget is in range with a zero-knowledge proof verified on zkVerify.",
   "private": true,
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thesithunyein/meritseal.git"
+  },
+  "homepage": "https://meritseal.vercel.app",
+  "license": "MIT",
+  "keywords": [
+    "ai-agent",
+    "zero-knowledge",
+    "zkverify",
+    "groth16",
+    "circom",
+    "grants",
+    "nlnet",
+    "gemini"
+  ],
   "scripts": {
     "start": "node agent/server.mjs",
     "test": "node --test agent/*.test.mjs",

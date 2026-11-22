@@ -1,27 +1,25 @@
-# Brand â€” MeritSeal
+# Brand: MeritSeal
 
-Private eligibility infrastructure for grant programs.
+MeritSeal is an AI agent that checks grant applications against a funder's published rules while keeping the applicant's budget private.
 
 ## Direction
 
-- **Archetype:** refined trust infrastructure
-- **Mood:** calm, premium, precise
-- **Surface:** warm white with hairline neutral borders; no gradients or decorative stock/AI artwork
-- **Accent:** deep indigo (`#283A8C`); green is reserved for verified states
-- **Typography:** Manrope for interface, Newsreader for selective editorial emphasis, DM Mono for hashes and records
+- **Mood:** calm, precise, trustworthy
+- **Surface:** warm white with hairline neutral borders
+- **Accent:** deep indigo (`#283A8C`); green is reserved for passed checks and confirmed records
+- **Typography:** Manrope for the interface, Newsreader for selective emphasis, DM Mono for IDs and codes
 
 ## Voice
 
-Use short, clear sentences. State what is checked and what remains private. Do not call the product an AI agent, a demo, a hackathon project, or use unsupported security claims.
+Write for someone new to crypto. Use short, plain sentences: say what is checked, what stays private and what to do next. Explain technical terms the first time ("a zero-knowledge proof: a short piece of math that shows your budget is in range without revealing it"). Keep technical detail in "Technical details" sections. Never overstate: the AI's report is advisory, and NLnet makes its own decisions.
 
 ## Do
 
-- Use the original Proof Seal mark and purposeful data visuals.
-- Use quiet motion and generous whitespace.
-- Make trust boundaries explicit.
+- Lead with what the person should do next.
+- Make privacy boundaries explicit: what leaves the device and what does not.
+- Show evidence (quotes, public records) next to every verdict.
 
 ## Don't
 
-- Use AI-generated art, crypto clichÃ©s, fake metrics, gradients, or glassmorphism.
-- Make an unverified input sound authenticated.
-
+- Use crypto clichés, fake metrics, gradients or decorative AI artwork.
+- Present an unverified claim as checked.

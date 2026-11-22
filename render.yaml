@@ -7,6 +7,10 @@ services:
     startCommand: npm start
     healthCheckPath: /health
     envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: KURIER_API_KEY
+        sync: false
       - key: AGENT_GAMES_HMAC_SECRET
         sync: false
       - key: NODE_VERSION

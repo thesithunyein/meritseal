@@ -3,650 +3,226 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="MeritSeal creates private eligibility policies and checkable decision receipts." />
-  <title>MeritSeal &mdash; Private grant reviews.</title>
+  <meta name="description" content="Check your grant application against NLnet's published rules with an AI agent. Your budget stays private: it is checked on your device with a zero-knowledge proof." />
+  <title>MeritSeal: check your grant application, keep your budget private</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
-  <style>:root{--ink:#17213a;--ink-2:#31405c;--muted:#6e7890;--paper:#fffefd;--wash:#f7f7f5;--line:#e5e8eb;--accent:#283a8c;--soft:#eef0fb;--green:#16715b;--serif:"Newsreader",Georgia,serif;--sans:"Manrope",Arial,sans-serif;--mono:"DM Mono",monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:500 15px/1.6 var(--sans)}.wrap{width:min(1160px,calc(100% - 48px));margin:auto}.nav{height:82px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:9px;color:var(--ink);font-size:16px;font-weight:700;text-decoration:none;letter-spacing:-.04em}.mark{width:25px;height:25px;fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round}.nav nav{display:flex;gap:28px;margin-left:96px}.nav nav a,.text-link{color:var(--muted);text-decoration:none;font-size:13px;font-weight:600}.nav nav a:hover,.text-link:hover{color:var(--accent)}.button{display:inline-flex;justify-content:center;align-items:center;min-height:44px;padding:0 17px;border-radius:8px;border:1px solid transparent;text-decoration:none;font:700 13px var(--sans);cursor:pointer;transition:transform .2s cubic-bezier(.23,1,.32,1),background-color .2s,border-color .2s}.button:hover{transform:translateY(-1px)}.button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid rgb(40 58 140 / .25);outline-offset:3px}.primary{background:var(--accent);color:#fff}.primary:hover{background:#20317c}.quiet{border-color:#d9ddea;background:#fff;color:var(--ink)}.quiet:hover{background:#f5f6fa}.hero{min-height:622px;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:54px;padding:70px 0 88px}.eyebrow{margin:0 0 16px;color:var(--accent);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}.eyebrow span{display:inline-block;width:7px;height:7px;margin:0 8px 1px 0;border-radius:50%;background:#22a781}.hero h1,.section-intro h2,.privacy h2,.workspace h2{margin:0;font-size:clamp(44px,5vw,72px);line-height:.98;letter-spacing:-.065em;font-weight:600}.hero h1 em{font-family:var(--serif);font-weight:500;color:var(--accent)}.lede{max-width:455px;margin:24px 0;color:var(--ink-2);font-size:18px;line-height:1.6}.actions{display:flex;align-items:center;gap:23px}.text-link i{font-style:normal;color:var(--accent);margin-left:4px}.micro{margin-top:22px;color:#8b94a7;font-size:12px}.hero-object{height:455px;position:relative;display:grid;place-items:center;isolation:isolate}.orb{position:absolute;border-radius:50%;filter:blur(0);z-index:-1}.orb-a{width:300px;height:300px;background:radial-gradient(circle at 35% 35%,#e7e9fa 0,#f2f3fb 52%,transparent 68%);top:26px;right:25px}.orb-b{width:120px;height:120px;background:#e2f2eb;bottom:28px;left:55px;opacity:.8}.receipt-card{width:min(356px,82%);padding:22px;background:rgb(255 255 255 / .86);border:1px solid #dfe3ea;border-radius:12px;box-shadow:0 26px 60px rgb(23 33 58 / .12);backdrop-filter:blur(16px);transform:rotate(3deg)}.receipt-top,.receipt-rule,.receipt-hash{display:flex;align-items:center;justify-content:space-between}.mini-brand{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700}.mini-brand svg{width:16px;fill:none;stroke:var(--accent);stroke-width:2.6}.live-dot{color:var(--green);font:500 10px var(--mono)}.live-dot:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#22a781;margin-right:5px}.receipt-title{margin:30px 0 17px;font-size:22px;font-weight:700;letter-spacing:-.05em}.receipt-rule{padding:10px 0;border-top:1px solid #edf0f3;font-size:11px;color:var(--muted)}.receipt-rule b{color:var(--ink);font:500 10px var(--mono)}.check{display:grid;place-items:center;width:17px;height:17px;margin-right:8px;border-radius:50%;background:#e7f5f0;color:var(--green);font-weight:700}.receipt-rule span:nth-child(2){margin-right:auto}.receipt-hash{margin-top:19px;padding:11px;border-radius:6px;background:#f5f6fb;color:var(--muted);font-size:10px}.receipt-hash code{color:var(--accent);font:500 10px var(--mono)}.seal{position:absolute;right:4%;bottom:17%;width:82px;height:82px;border-radius:50%;display:grid;place-items:center;background:var(--accent);box-shadow:0 14px 28px rgb(40 58 140 / .22);transform:rotate(-10deg)}.seal svg{width:48px;fill:none;stroke:#fff;stroke-width:3;stroke-linejoin:round}.proof-strip{background:var(--ink);color:#f7f8fd}.proof-items{height:80px;display:flex;align-items:center;justify-content:center;gap:28px;font:500 12px var(--mono);letter-spacing:.02em}.proof-items i{width:3px;height:3px;background:#91a0df;border-radius:50%}.system{padding:132px 0}.section-intro{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:66px}.section-intro h2,.privacy h2,.workspace h2{font-size:47px}.steps{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}.steps li{min-height:160px;display:grid;grid-template-columns:95px 1fr 88px;gap:20px;align-items:center;border-bottom:1px solid var(--line)}.step-number{font:500 12px var(--mono);color:#9ba4b5}.steps h3{margin:0 0 5px;font-size:20px;letter-spacing:-.045em}.steps p{max-width:470px;margin:0;color:var(--muted)}.line-icon{justify-self:end;display:block;width:41px;height:41px;border:1px solid #dce2ed;border-radius:11px;position:relative}.rule-icon:before,.rule-icon:after{content:"";position:absolute;left:11px;right:11px;height:2px;background:var(--accent);top:14px;box-shadow:0 7px 0 var(--accent)}.privacy{padding:95px 8%;display:grid;grid-template-columns:1fr 1fr;gap:80px;background:#f3f5fa;border-radius:18px}.privacy-copy>p{font-size:18px;line-height:1.65;color:var(--ink-2);margin-top:0}.boundary{margin-top:31px;border-top:1px solid #dce1e9}.boundary>div{padding:16px 0;border-bottom:1px solid #dce1e9;display:flex;justify-content:space-between;gap:20px}.boundary-label{font-size:12px;color:var(--muted)}.boundary strong{font-size:12px;color:var(--ink);text-align:right}.workspace{padding:132px 0}.workspace-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:38px}.workspace-head h2{font-size:44px}.workspace-head>div>p:last-child{margin:10px 0 0;color:var(--muted)}.workspace-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,.92fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgb(23 33 58 / .04)}.policy-form{padding:32px;border-right:1px solid var(--line);display:grid;gap:19px;background:#fff}.policy-form label{display:grid;gap:7px;color:var(--ink);font-size:12px;font-weight:700}.policy-form input,.policy-form textarea{width:100%;border:1px solid #dce1e9;background:#fff;border-radius:7px;padding:11px 12px;color:var(--ink);font:500 13px/1.55 var(--sans);resize:vertical}.policy-form input::placeholder,.policy-form textarea::placeholder{color:#a2aabd}.policy-form input:focus,.policy-form textarea:focus{border-color:#7786c4}.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}.private-note{margin-top:4px}.private-note span{font-weight:500;color:#8993a7}.full{width:100%;margin-top:4px}.receipt-output{min-height:490px;padding:32px;background:#fbfbfa}.output-empty{height:100%;min-height:420px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.output-empty svg{width:39px;fill:none;stroke:#aab3c3;stroke-width:1.4}.output-empty h3{margin:16px 0 3px;font-size:16px;letter-spacing:-.035em}.output-empty p{max-width:230px;margin:0;color:var(--muted);font-size:13px}.issued-receipt .result-label{color:var(--green);font:500 11px var(--mono)}.issued-receipt h3{font-size:25px;letter-spacing:-.05em;margin:12px 0 24px}.result-row{display:flex;justify-content:space-between;gap:18px;padding:12px 0;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.result-row b,.result-row code{color:var(--ink);font:500 11px var(--mono);text-align:right;overflow-wrap:anywhere}.result-checks{margin:22px 0;padding:16px;background:#fff;border:1px solid var(--line);border-radius:9px}.result-checks span{display:block;margin-bottom:9px;color:var(--muted);font-size:11px}.result-checks ul{margin:0;padding:0;list-style:none}.result-checks li{padding:6px 0;font-size:12px}.result-checks li:before{content:"&#10003;";color:var(--green);font-weight:700;margin-right:9px}.copy-button{width:100%;margin-top:20px}.toast{margin-top:12px;color:var(--green);font-size:11px;text-align:center}.footer{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;padding:34px 0;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.footer p{text-align:center;margin:0}.footer p:last-child{text-align:right}@media(max-width:760px){.wrap{width:min(100% - 36px,1160px)}.nav{height:70px}.nav nav{display:none}.nav .quiet{padding:0 12px;min-height:38px}.hero{grid-template-columns:1fr;padding:68px 0 46px;gap:26px;min-height:auto}.hero h1{font-size:52px}.hero-object{height:370px}.section-intro,.workspace-head{display:block}.section-intro h2,.privacy h2,.workspace h2{font-size:38px}.system,.workspace{padding:80px 0}.steps li{grid-template-columns:42px 1fr;min-height:142px}.line-icon{display:none}.privacy{grid-template-columns:1fr;padding:48px 28px;gap:25px;border-radius:13px}.workspace-head .quiet{margin-top:18px}.workspace-grid{grid-template-columns:1fr}.policy-form{border-right:0;border-bottom:1px solid var(--line);padding:24px}.receipt-output{min-height:400px;padding:24px}.footer{grid-template-columns:1fr;gap:15px;text-align:center}.footer .brand{justify-content:center}.footer p:last-child,.footer p{text-align:center}.proof-items{gap:14px;font-size:10px}.orb-b{left:0}.seal{right:2%}}
-
-
-/* Give the receipt depth while keeping its text readable. */
-@media (prefers-reduced-motion: no-preference) {
-  .receipt-card {
-    animation: receipt-float 8s ease-in-out infinite;
-    animation-iteration-count: 1;
-  }
-  @keyframes receipt-float {
-    0%, 100% { transform: perspective(900px) rotateZ(3deg); }
-    45% { transform: perspective(900px) translateY(-10px) rotateX(8deg) rotateY(-10deg) rotateZ(1deg); }
-    72% { transform: perspective(900px) translateY(-4px) rotateX(3deg) rotateY(5deg) rotateZ(3deg); }
-  }
-}
-
-#faq summary{cursor:pointer;font-weight:650;padding:.5rem 0}#faq details+details{border-top:1px solid #e5e8eb}#faq details p{margin:.25rem 0 1rem}#review output{display:block;font-weight:650;min-height:1.5em}
-@media (prefers-reduced-motion: no-preference) {
-  .hero h1, .hero a.button { animation: meritseal-enter .48s ease-out both; }
-  .hero a.button { animation-delay: .1s; }
-  @keyframes meritseal-enter {
-    from { opacity: .25; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .button { transition: transform .18s ease, box-shadow .18s ease; }
-  .button:active { transform: translateY(1px); }
-  @media (hover: hover) { .button:hover { transform: translateY(-2px); } }
-  #faq details[open] > p { animation: meritseal-enter .22s ease-out both; }
-}
-
-:root { color-scheme:light; --quiet-ink:#4c5871; }
-.hero { min-height:0; padding-block:clamp(46px,7vw,96px); gap:clamp(24px,5vw,72px); }
-.hero-copy .lede { max-width:40ch; }
-.hero-object.seal-art { background:#f5f6fb; border:1px solid var(--line); border-radius:24px; min-height:0; padding:clamp(12px,4vw,44px); isolation:isolate; }
-.seal-art svg { display:block; width:100%; height:auto; max-height:320px; }
-#review { padding-top:clamp(24px,4vw,56px); }
-#review .workspace-head p { max-width:64ch; }
-#review .workspace-head a { color:#283a8c; text-underline-offset:3px; }
-#review .policy-form { display:flex; flex-direction:column; align-items:stretch; gap:16px; }
-#review .policy-form > div { display:flex; flex-wrap:wrap; gap:8px; }
-#review textarea { font: .84rem/1.6 "DM Mono",monospace; }
-#review .policy-form > p { color:var(--quiet-ink); font-size:.9rem; margin:0; }
-#review summary { cursor:pointer; min-height:44px; padding-block:10px; font-weight:650; }
-#review output:empty { display:none; }
-#review [aria-invalid=true] { border-color:#9a3232; }
-#review :focus-visible, #faq :focus-visible { outline:2px solid #283a8c; outline-offset:3px; }
-#proof .policy-form { gap:12px; }
-@media(max-width:600px){ .hero-object.seal-art{max-width:420px;width:100%;margin-inline:auto;} #review .policy-form{padding:20px;} }
-
-#review output:not(:empty){width:fit-content;max-width:100%;padding:8px 12px;border-radius:8px;background:var(--wash);font-size:.9rem;}
-#review output[data-tone=pass]{background:#eef6f1;color:#21513b;}
-#review output[data-tone=fail]{background:#fbefef;color:#782d32;}
-#review .workspace-grid{box-shadow:none;}
-#review textarea{resize:vertical;}
-
-#review .button .ui-icon,#proof .button .ui-icon{width:18px;height:18px;flex:none;margin-inline-end:8px;vertical-align:middle;}
-#review output[data-tone]:not(:empty){display:inline-flex;gap:8px;align-items:center;}
-#review output[data-tone]:not(:empty)::before{content:"";display:block;width:16px;height:16px;flex:none;background:currentColor;mask:center/contain no-repeat var(--status-icon);}
-#review output[data-tone=pass]{--status-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20class%3D%22ui-icon%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.65%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20aria-hidden%3D%22true%22%20focusable%3D%22false%22%3E%3Cpath%20d%3D%22m5%2012%204%204%2010-10%22%2F%3E%3C%2Fsvg%3E");}
-#review output[data-tone=fail]{--status-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20class%3D%22ui-icon%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.65%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20aria-hidden%3D%22true%22%20focusable%3D%22false%22%3E%3Cpath%20d%3D%22M12%208v5m0%203h.01M12%203a9%209%200%201%200%200%2018%209%209%200%200%200%200-18Z%22%2F%3E%3C%2Fsvg%3E");}
-@media (prefers-reduced-motion: no-preference){
-  #review output[data-tone]:not(:empty){animation:ms-result-in 150ms cubic-bezier(.23,1,.32,1) both;}
-  @keyframes ms-result-in{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
-}
-
-.line-icon{display:grid;place-items:center;color:#283a8c;background:#f5f6fb;}
-.line-icon::before,.line-icon::after{content:none;}
-.line-icon svg,#faq summary svg{width:18px;height:18px;flex:none;}
-#faq{max-width:810px;padding:clamp(24px,5vw,56px);margin:clamp(48px,8vw,100px) auto;background:#f5f6fb url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2264%22%20height%3D%2248%22%20viewBox%3D%220%200%2064%2048%22%3E%3Cpath%20d%3D%22M0%200%2032%2016%2064%200M0%2048l32-16%2032%2016M32%2016v16%22%20fill%3D%22none%22%20stroke%3D%22%23283a8c%22%20stroke-opacity%3D%22.08%22%2F%3E%3C%2Fsvg%3E");border:1px solid var(--line);border-radius:24px;}
-#faq .workspace-head{display:block;text-align:center;margin:0 0 20px;}
-#faq .workspace-head svg{width:28px;height:28px;color:#283a8c;margin-bottom:8px;}
-#faq .policy-form{padding:0 16px;background:var(--paper);border:1px solid var(--line);border-radius:14px;display:block;}
-#faq summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;padding-block:10px;list-style:none;}
-#faq summary::-webkit-details-marker{display:none;}
-#faq summary svg{color:#283a8c;}
-#faq details[open] summary svg{transform:rotate(180deg);}
-#faq details p{max-width:60ch;color:var(--quiet-ink);}
-@media (prefers-reduced-motion:no-preference){#faq summary svg{transition:transform 150ms cubic-bezier(.23,1,.32,1);}}
-@media(max-width:860px){#faq{margin-inline:20px;}}
-
-.hero-object.seal-art{background:#f4f6fc url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%3E%3Cpath%20d%3D%22M32%200H0v32%22%20fill%3D%22none%22%20stroke%3D%22%23283a8c%22%20stroke-opacity%3D%22.09%22%2F%3E%3Ccircle%20cx%3D%221%22%20cy%3D%221%22%20r%3D%221%22%20fill%3D%22%23283a8c%22%20fill-opacity%3D%22.15%22%2F%3E%3C%2Fsvg%3E");padding:clamp(8px,2.5vw,30px);overflow:hidden;}
-.hero-seal-layer{filter:drop-shadow(0 6px 5px #283a8c19);}
-@media (prefers-reduced-motion: no-preference) {
-  .hero-seal-layer {
-    transform-box:fill-box;
-    transform-origin:50% 80%;
-    animation:seal-dock 480ms cubic-bezier(.23,1,.32,1) both;
-  }
-  .hero-seal-shadow {
-    transform-box:fill-box;
-    transform-origin:center;
-    animation:seal-shadow 480ms cubic-bezier(.23,1,.32,1) both;
-  }
-  .hero-seal-check {
-    stroke-dasharray:1;
-    animation:seal-check 220ms cubic-bezier(.23,1,.32,1) 320ms both;
-  }
-  @keyframes seal-dock {
-    from { transform:translateY(-32px) scale(.94) rotate(-5deg); }
-    to { transform:translateY(0) scale(1) rotate(0); }
-  }
-  @keyframes seal-shadow {
-    from { opacity:.04; transform:scale(.72); }
-    to { opacity:.14; transform:scale(1); }
-  }
-  @keyframes seal-check {
-    from { stroke-dashoffset:1; }
-    to { stroke-dashoffset:0; }
-  }
-}
-
-#review #receiptShare[hidden],#review #receiptLinkFallback[hidden],#receipt[hidden],#sharedDetails[hidden]{display:none;}
-.shared-receipt{max-width:680px;margin-inline:auto;padding:clamp(20px,5vw,44px);background:var(--paper);border:1px solid var(--line);border-radius:18px;}
-.shared-receipt dl{margin-block:20px;}
-.shared-receipt dl div{display:grid;grid-template-columns:minmax(72px,1fr) 2fr;gap:12px;padding:10px 0;border-top:1px solid var(--line);}
-.shared-receipt dt,.receipt-limit{color:var(--quiet-ink);}
-.shared-receipt dd{margin:0;overflow-wrap:anywhere;}
-.shared-receipt pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.85rem;}
-.shared-receipt summary{cursor:pointer;min-height:44px;padding-block:10px;}
-.shared-receipt .text-link{display:inline-flex;align-items:center;min-height:44px;}
-
-.history-panel{border:1px solid var(--line);border-radius:14px;padding:16px 24px;background:var(--paper);}
-#reviewHistory{padding:0;margin:0;list-style:none;}
-#reviewHistory li{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:12px 0;}
-#reviewHistory li+li{border-top:1px solid var(--line);}
-#reviewHistory time{display:block;color:var(--quiet-ink);font-size:.9rem;}
-#reviewHistory li>div:last-child{display:flex;flex-wrap:wrap;gap:8px;}
-#historyStatus:empty{display:none;}
-
-.hero.wrap{padding-block:clamp(32px,5vw,72px);}
-.hero-object.seal-art svg{max-height:280px;}
-#review,#history,#workspace,#how,#privacy,#proof,#faq{scroll-margin-top:24px;}
-
-[data-product-view][hidden]{display:none!important;}
-.nav a[aria-current]{color:#283a8c;text-decoration:underline;text-underline-offset:6px;}
-@media(max-width:760px){
-.nav{height:auto;flex-wrap:wrap;gap:4px 12px;padding-top:12px;}
-.nav nav{display:flex;order:3;flex:0 0 100%;margin-left:0;gap:0 16px;flex-wrap:wrap;}
-.nav nav a{display:inline-flex;align-items:center;min-height:44px;}
-}
-
-.panel-title{display:flex;align-items:center;gap:10px;margin:0;font-size:1rem;font-weight:700;letter-spacing:-.015em;}
-.panel-title .panel-icon{width:20px;height:20px;color:var(--accent);flex:none;}
-#review .workspace-head,#workspace .workspace-head,#history .workspace-head{margin-bottom:24px;}
-#review .workspace-head h2,#workspace .workspace-head h2,#history .workspace-head h2,.shared-receipt h2{font-size:clamp(30px,4vw,44px);line-height:1.08;}
-#review #grantVerify{background:#f7f8fc;}
-#review #grantVerify textarea{background:var(--paper);}
-#review #grantVerify>p{max-width:48ch;}
-#review textarea,#sharedJson{tab-size:2;}
-#historyEmpty{margin:8px 0;color:var(--quiet-ink);}
-#historyEmpty a{color:var(--accent);text-underline-offset:3px;}
-#proof>.policy-form{border:1px solid var(--line);border-radius:16px;background:#f7f8fc;}
-#proof>.policy-form>p:not(.eyebrow){max-width:64ch;margin:0;}
-#proof h2{font-size:clamp(28px,4vw,42px);}
-@media(max-width:760px){
-#review #grantVerify{border-top:1px solid var(--line);}
-#review .policy-form,.history-panel{padding:20px;}
-.nav nav{gap:0 12px;}
-}
-
-#workspace.wrap{max-width:900px;padding-block:clamp(24px,4vw,52px) clamp(48px,6vw,80px);}
-#workspace .workspace-head{gap:16px;align-items:center;}
-#workspace .workspace-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);}
-#workspace .policy-form,#workspace .receipt-output{padding:clamp(20px,3vw,32px);min-width:0;}
-@media(max-width:760px){
-  #workspace .workspace-grid{grid-template-columns:minmax(0,1fr);}
-}
-
-#history.wrap{max-width:760px;padding-block:clamp(24px,4vw,52px) clamp(48px,6vw,80px);}
-#history .history-panel{padding:clamp(16px,3vw,24px);}
-
-#review.wrap{max-width:960px;padding-block:clamp(24px,4vw,52px) clamp(48px,6vw,80px);}
-#review .workspace-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
-#review .policy-form{min-width:0;padding:clamp(20px,3vw,32px);}
-@media(max-width:760px){
-  #review .workspace-grid{grid-template-columns:minmax(0,1fr);}
-}
-
-body{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;}
-body>main{flex:1 0 auto;}
-body>.nav,body>.footer{flex-shrink:0;margin-block:0;}
-#zk output:not(:empty){display:block;width:fit-content;max-width:100%;padding:8px 12px;border-radius:8px;background:var(--wash);font-size:.9rem;}
-#zk output[data-tone=pass]{background:#eef6f1;color:#21513b;}
-#zk output[data-tone=fail]{background:#fbefef;color:#782d32;}
-#zk .policy-form{display:flex;flex-direction:column;gap:14px;min-width:0;}
-#zk .policy-form>div{display:flex;flex-wrap:wrap;gap:8px;}
-#zk textarea{font:.8rem/1.5 "DM Mono",monospace;resize:vertical;}
-#zk .receipt-output{display:flex;flex-direction:column;gap:24px;min-height:0;min-width:0;}
-#zk [aria-invalid=true]{border-color:#9a3232;}
-#zk.wrap{max-width:960px;padding-block:clamp(24px,4vw,52px) clamp(48px,6vw,80px);scroll-margin-top:24px;}
-#zk .workspace-head h2{font-size:clamp(30px,4vw,44px);line-height:1.08;}
-@media(max-width:760px){#zk .workspace-grid{grid-template-columns:minmax(0,1fr);}}
-#screen output:not(:empty){display:block;width:fit-content;max-width:100%;padding:8px 12px;border-radius:8px;background:var(--wash);font-size:.9rem;}
-#screen output[data-tone=pass]{background:#eef6f1;color:#21513b;}
-#screen output[data-tone=fail]{background:#fbefef;color:#782d32;}
-#screen .policy-form{display:flex;flex-direction:column;gap:14px;min-width:0;}
-#screen .policy-form>div{display:flex;flex-wrap:wrap;gap:8px;}
-#screen textarea{font:.88rem/1.55 var(--sans);resize:vertical;}
-#screen .receipt-output{min-width:0;}
-#screen.wrap{max-width:1080px;padding-block:clamp(24px,4vw,52px) clamp(48px,6vw,80px);scroll-margin-top:24px;}
-#screen .workspace-head h2{font-size:clamp(30px,4vw,44px);line-height:1.08;}
-.screen-report{display:flex;flex-direction:column;gap:12px;}
-.screen-decision{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin:0;font-size:1.25rem;}
-.screen-decision[data-decision=APPROVE] b{color:var(--green);}
-.screen-decision[data-decision=REJECT] b{color:#8a3a2c;}
-.screen-decision code{font:.78rem var(--mono);color:var(--muted);}
-.screen-summary{margin:0;color:var(--ink-2);}
-.screen-rules{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
-.screen-rules li{display:grid;grid-template-columns:86px 1fr;column-gap:12px;row-gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);}
-.screen-rules li>*:not(.verdict){grid-column:2;}
-.screen-rules .verdict{grid-row:span 5;align-self:start;text-align:center;font:600 .72rem var(--mono);text-transform:uppercase;padding:4px 6px;border-radius:6px;background:var(--wash);}
-.screen-rules li[data-verdict=PASS] .verdict{background:#e6f3ec;color:#1d5c40;}
-.screen-rules li[data-verdict=NEEDS_INFO] .verdict{background:#fbf3df;color:#7a5512;}
-.screen-rules li[data-verdict=FAIL] .verdict{background:#fbe9e7;color:#8a3a2c;}
-.screen-rules p{margin:0;font-size:.9rem;color:var(--ink-2);}
-.screen-rules q{font-size:.85rem;color:var(--muted);font-style:italic;}
-.screen-rules small{font-size:.75rem;color:var(--muted);}
-.screen-chain{font:.8rem var(--mono);}
-.screen-suggestion{margin:0;padding:10px 12px;border-radius:8px;background:var(--soft);font-size:.9rem;}
-.screen-report pre{white-space:pre-wrap;font:.78rem/1.5 var(--mono);max-height:260px;overflow:auto;background:var(--wash);padding:10px;border-radius:8px;}
-.screen-actions{display:flex;flex-wrap:wrap;gap:8px;}
-@media(max-width:860px){#screen .workspace-grid{grid-template-columns:minmax(0,1fr);}}
-#audit output:not(:empty){display:block;width:fit-content;max-width:100%;padding:8px 12px;border-radius:8px;background:var(--wash);font-size:.9rem;}
-#audit output[data-tone=pass]{background:#eef6f1;color:#21513b;}
-#audit output[data-tone=fail]{background:#fbefef;color:#782d32;}
-#audit .policy-form{display:flex;flex-direction:column;gap:14px;min-width:0;}
-#audit .policy-form>div{display:flex;flex-wrap:wrap;gap:8px;}
-#audit textarea{font:.78rem/1.5 var(--mono);resize:vertical;}
-#audit .receipt-output{min-width:0;}
-#audit.wrap{max-width:1080px;padding-block:clamp(24px,4vw,52px) clamp(48px,6vw,80px);scroll-margin-top:24px;}
-#audit .workspace-head h2{font-size:clamp(30px,4vw,44px);line-height:1.08;}
-.audit-summary p{margin:0 0 6px;}
-.audit-big{font:600 1.6rem var(--serif);}
-.audit-big[data-ok=true]{color:var(--green);}
-.audit-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:10px;}
-.audit-table th,.audit-table td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top;}
-.audit-table th{font:600 .72rem var(--mono);text-transform:uppercase;color:var(--muted);}
-.audit-table td:nth-child(2){font-family:var(--mono);}
-.audit-table tr[data-status=VALID] b{color:var(--green);}
-.audit-table tr[data-status=INVALID] b,.audit-table tr[data-status=DUPLICATE] b{color:#8a3a2c;}
-.audit-table small{color:var(--muted);}
-@media(max-width:860px){#audit .workspace-grid{grid-template-columns:minmax(0,1fr);}}
-</style><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2036%2036%22%20role%3D%22img%22%20aria-label%3D%22MeritSeal%22%3E%3Crect%20width%3D%2236%22%20height%3D%2236%22%20rx%3D%228%22%20fill%3D%22%23edf0fa%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23283a8c%22%20stroke-width%3D%221.8%22%20stroke-linejoin%3D%22round%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M18%203%2030%209.8v13.5L18%2030%206%2023.3V9.8L18%203Z%22%2F%3E%3Cpath%20d%3D%22M11.2%2013.1%2018%2017l6.8-3.9M18%2017v8.1%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+  <style>
+:root{--ink:#17213a;--ink-2:#31405c;--muted:#5f6a82;--paper:#fffefd;--wash:#f7f7f5;--line:#e5e8eb;--accent:#283a8c;--soft:#eef0fb;--green:#16715b;--red:#8a3a2c;--amber:#7a5512;--serif:"Newsreader",Georgia,serif;--sans:"Manrope",Arial,sans-serif;--mono:"DM Mono",monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:500 16px/1.6 var(--sans)}
+.wrap{width:min(1120px,calc(100% - 40px));margin:auto}
+a{color:var(--accent)}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;background:#fff;padding:8px 12px;z-index:9}
+.nav{min-height:76px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;color:var(--ink);font-size:17px;font-weight:700;text-decoration:none;letter-spacing:-.03em}
+.mark{width:26px;height:26px;fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round}
+.nav nav{display:flex;flex-wrap:wrap;gap:22px}.nav nav a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:600}.nav nav a:hover,.nav nav a[aria-current=page]{color:var(--accent)}
+.button{display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:46px;padding:0 18px;border-radius:9px;border:1px solid transparent;text-decoration:none;font:700 14px var(--sans);cursor:pointer;transition:background-color .15s,border-color .15s}
+.button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid rgb(40 58 140/.3);outline-offset:3px}
+.button[disabled]{opacity:.55;cursor:progress}
+.primary{background:var(--accent);color:#fff}.primary:hover{background:#20317c}.quiet{border-color:#d4d9e6;background:#fff;color:var(--ink)}.quiet:hover{background:#f5f6fa}
+.small{min-height:38px;padding:0 13px;font-size:13px}
+h1,h2,h3{letter-spacing:-.03em;line-height:1.1}
+.eyebrow{margin:0 0 12px;color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:48px;padding:64px 0 56px}
+.hero h1{margin:0;font-size:clamp(38px,5vw,62px);letter-spacing:-.055em;font-weight:600}.hero h1 em{font-family:var(--serif);font-weight:500;color:var(--accent)}
+.lede{max-width:540px;margin:20px 0 26px;color:var(--ink-2);font-size:18px}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.trust{display:flex;flex-wrap:wrap;gap:8px 18px;margin:22px 0 0;padding:0;list-style:none;color:var(--muted);font-size:14px}.trust li::before{content:"✓ ";color:var(--green);font-weight:700}
+.seal-art svg{width:100%;height:auto;max-height:380px}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 64px;padding:0;list-style:none;counter-reset:s}
+.steps3 li{padding:20px;border:1px solid var(--line);border-radius:12px;background:#fff;counter-increment:s}
+.steps3 li::before{content:counter(s);display:inline-grid;place-items:center;width:28px;height:28px;margin-bottom:10px;border-radius:50%;background:var(--soft);color:var(--accent);font-weight:700}
+.steps3 b{display:block;margin-bottom:4px}.steps3 p{margin:0;color:var(--muted);font-size:14px}
+section.view{padding:40px 0 72px}
+.head{max-width:760px;margin-bottom:26px}.head h2{margin:0 0 10px;font-size:clamp(30px,4vw,44px);letter-spacing:-.045em}.head p{margin:0;color:var(--ink-2)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px;align-items:start}
+.panel{padding:24px;border:1px solid var(--line);border-radius:14px;background:#fff;display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel h3{margin:0;font-size:19px}
+label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px}
+.hint{font-weight:500;color:var(--muted);font-size:13px}
+input,textarea{width:100%;padding:12px 13px;border:1px solid #cfd5e2;border-radius:9px;background:#fff;color:var(--ink);font:500 15px/1.55 var(--sans)}
+textarea{resize:vertical}textarea.code{font:.8rem/1.5 var(--mono)}
+input[aria-invalid=true],textarea[aria-invalid=true]{border-color:#b04a3a}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.budget{display:flex;align-items:center;gap:8px}.budget span{font-weight:700;color:var(--muted)}
+.lock{display:flex;gap:10px;padding:12px 14px;border-radius:10px;background:var(--soft);font-size:14px;color:var(--ink-2)}.lock b{color:var(--ink)}
+output:not(:empty){display:block;padding:10px 13px;border-radius:9px;background:var(--wash);font-size:14px}
+output[data-tone=pass]{background:#eaf5ef;color:#1d5c40}output[data-tone=fail]{background:#fbeeee;color:#782d32}
+.placeholder{padding:28px;border:1px dashed #d4d9e6;border-radius:14px;color:var(--muted);text-align:center}
+.progress{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.progress li{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:15px}
+.progress li::before{content:"";width:18px;height:18px;flex:none;border-radius:50%;border:2px solid #cfd5e2}
+.progress li[data-state=active]{color:var(--ink);font-weight:700}.progress li[data-state=active]::before{border-color:var(--accent);border-top-color:transparent;animation:spin .8s linear infinite}
+.progress li[data-state=done]{color:var(--ink-2)}.progress li[data-state=done]::before{content:"✓";display:grid;place-items:center;border:0;background:var(--green);color:#fff;font-size:11px;font-weight:700}
+.progress li[data-state=failed]::before{content:"!";display:grid;place-items:center;border:0;background:var(--red);color:#fff;font-size:11px;font-weight:700}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.progress li[data-state=active]::before{animation:none}}
+.verdict-card{padding:20px;border-radius:12px;background:var(--wash)}
+.verdict-card[data-ok=true]{background:#eaf5ef}.verdict-card[data-ok=false]{background:#fdf3ea}
+.verdict-card h3{margin:0 0 6px;font-size:24px}.verdict-card p{margin:0;color:var(--ink-2)}
+.verdict-card[data-ok=true] h3{color:var(--green)}.verdict-card[data-ok=false] h3{color:#8a4a12}
+.rules{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.rules li{padding:14px 16px;border:1px solid var(--line);border-left-width:4px;border-radius:10px;background:#fff}
+.rules li[data-verdict=PASS]{border-left-color:#3a9a72}.rules li[data-verdict=NEEDS_INFO]{border-left-color:#d4a12a}.rules li[data-verdict=FAIL]{border-left-color:#c4553f}
+.rules .tag{display:inline-block;margin-right:8px;padding:2px 8px;border-radius:6px;font:600 11px var(--mono);text-transform:uppercase;vertical-align:2px}
+.rules li[data-verdict=PASS] .tag{background:#e6f3ec;color:#1d5c40}.rules li[data-verdict=NEEDS_INFO] .tag{background:#fbf3df;color:var(--amber)}.rules li[data-verdict=FAIL] .tag{background:#fbe9e7;color:var(--red)}
+.rules b{font-size:16px}.rules p{margin:6px 0 0;color:var(--ink-2);font-size:14px}.rules q{display:block;margin-top:6px;color:var(--muted);font-size:13px;font-style:italic}
+.rules small{display:block;margin-top:6px;color:var(--muted);font-size:12px}
+.group-title{margin:6px 0 0;font-size:15px;color:var(--muted);font-weight:700}
+.tip{padding:12px 14px;border-radius:10px;background:var(--soft);font-size:14px}
+details{border:1px solid var(--line);border-radius:10px;background:#fff}details>summary{cursor:pointer;padding:12px 14px;font-weight:700;font-size:14px}
+details>div,details>pre{margin:0;padding:0 14px 14px}details pre{white-space:pre-wrap;font:.78rem/1.5 var(--mono);max-height:260px;overflow:auto}
+.public-record{font-size:14px}.public-record a{font-weight:700}
+.toast{margin:0;color:var(--green);font-size:13px}
+.audit-big{margin:0;font:600 30px var(--serif)}.audit-big[data-ok=true]{color:var(--green)}
+.audit-table{width:100%;border-collapse:collapse;font-size:14px}.audit-table th,.audit-table td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.audit-table th{font:600 11px var(--mono);text-transform:uppercase;color:var(--muted)}.audit-table td:nth-child(2){font-family:var(--mono);font-size:12px}
+.audit-table tr[data-status=VALID] b{color:var(--green)}.audit-table tr[data-status=INVALID] b,.audit-table tr[data-status=DUPLICATE] b{color:var(--red)}.audit-table small{display:block;color:var(--muted)}
+.table-scroll{overflow-x:auto}
+.issued-receipt{display:flex;flex-direction:column;gap:10px}.result-label{font:600 12px var(--mono);color:var(--muted);text-transform:uppercase}
+.result-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}.result-row code{font-size:12px}
+.result-checks{display:flex;flex-direction:column;gap:6px}
+.explain{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.explain article{padding:20px;border:1px solid var(--line);border-radius:12px;background:#fff}.explain h3{margin:0 0 6px;font-size:17px}.explain p{margin:0;color:var(--ink-2);font-size:15px}
+.faq{display:flex;flex-direction:column;gap:10px;max-width:820px}.faq details>div{color:var(--ink-2)}
+.footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding:28px 0 40px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.footer nav{display:flex;flex-wrap:wrap;gap:16px}
+[hidden]{display:none!important}
+@media(max-width:900px){.hero,.grid{grid-template-columns:minmax(0,1fr)}.seal-art{display:none}.steps3,.explain{grid-template-columns:minmax(0,1fr)}}
+  </style>
 </head>
 <body>
-  <header class="nav wrap">
-    <a class="brand" href="#top" aria-label="MeritSeal home">
-      <svg class="mark" viewBox="0 0 36 36" aria-hidden="true"><path d="M18 3 30 9.8v13.5L18 30 6 23.3V9.8L18 3Z"/><path d="M11.2 13.1 18 17l6.8-3.9M18 17v8.1"/></svg>
-      <span>MeritSeal</span>
-    </a>
-    <nav aria-label="Main navigation"><a href="#screen">AI screening</a><a href="#zk">ZK receipt</a><a href="#audit">Audit</a><a href="#review">Eligibility</a><a href="#history">Recent checks</a><a href="#workspace">Manual review</a><a href="#faq">FAQ</a></nav>
-    <a class="button quiet" href="#proof">View proof</a>
-  </header>
+<a class="skip" href="#main">Skip to content</a>
+<header class="wrap nav">
+  <a class="brand" href="#" aria-label="MeritSeal home"><svg class="mark" viewBox="0 0 36 36" aria-hidden="true"><path d="M18 3 30 9.8v13.5L18 30 6 23.3V9.8L18 3Z"/><path d="M11.2 13.1 18 17l6.8-3.9M18 17v8.1"/></svg><span>MeritSeal</span></a>
+  <nav aria-label="Main"><a href="#screen">Check my application</a><a href="#audit">For grant programs</a><a href="#how">How it works</a><a href="#faq">FAQ</a><a href="https://github.com/thesithunyein/meritseal">GitHub</a></nav>
+</header>
+<main id="main">
 
-  <main id="top">
-    <section class="hero wrap" data-product-view="home">
-      <div class="hero-copy">
-        <p class="eyebrow"><span></span> Grant review</p>
-        <h1>Review grants<br><em>privately.</em></h1>
-        <p class="lede">An AI agent screens your grant application against the funder&rsquo;s published rules. Your budget is proven in range with a zero-knowledge proof, so it never reaches the agent or the AI model. zkVerify records each proof.</p>
-        <div class="actions"><a class="button primary" href="#screen">Screen an application</a><a class="button quiet" href="#zk">ZK receipt only</a><a class="text-link" href="#how">How it works <i>&darr;</i></a></div>
-        <p class="micro">Amounts are removed before the AI reads your text. Only a zero-knowledge proof leaves your browser.</p>
-      </div>
-      <div class="hero-object seal-art" aria-hidden="true">
+<section class="view" data-view="home" aria-labelledby="homeTitle">
+  <div class="wrap hero">
+    <div>
+      <p class="eyebrow">For NLnet grant applicants</p>
+      <h1 id="homeTitle">Check your grant application, <em>keep your budget private.</em></h1>
+      <p class="lede">An AI agent reads your proposal, checks it against NLnet&rsquo;s published rules and tells you what to fix before you submit. Your budget is checked on your own device. The AI never sees it.</p>
+      <div class="actions"><a class="button primary" href="#screen">Check my application</a><a class="button quiet" href="#screen" data-try-sample="strong">Try it with an example</a></div>
+      <ul class="trust"><li>Free</li><li>No wallet or crypto needed</li><li>About 30 seconds</li></ul>
+    </div>
+    <div class="seal-art" aria-hidden="true">
 <svg viewBox="0 0 450 300" fill="none" focusable="false">
 <path d="M20 45V20h25m360 0h25v25M20 255v25h25m360 0h25v-25" stroke="#a3afd2"/>
-<path d="M225 26v250M40 150h370" stroke="#a3afd2" stroke-dasharray="3 6" opacity=".65"/>
-<path d="m225 95 154 72-154 72-154-72z" fill="#e5e9f6" stroke="#c1cbe4"/>
-<path d="m71 167 154 72 154-72v18l-154 72-154-72z" fill="#d6def3" stroke="#c1cbe4"/>
-<path d="m95 158 130 61 130-61M95 177l130 61 130-61" stroke="#a3afd2" stroke-dasharray="3 6"/>
-<ellipse class="hero-seal-shadow" cx="225" cy="197" rx="89" ry="22" fill="#283a8c" opacity=".14"/>
-<g class="hero-seal-layer" stroke="#283a8c" stroke-width="2" stroke-linejoin="round">
-<path d="m225 52 102 48v76l-102 48-102-48v-76z" fill="#fffefd"/>
-<path d="m123 100 102 48 102-48v76l-102 48v-76" fill="#e0e6f8"/>
-<path d="m123 100 102 48v76l-102-48z" fill="#eef1fa"/>
-<path d="m225 75 54 25-54 25-54-25z" fill="#dbe3fa"/>
-<path class="hero-seal-check" pathLength="1" d="m210 100 10 5 23-11" stroke-width="3" stroke-linecap="round"/>
-<path d="m148 145 47 22m-47-4 28 13m77-9 47-22m-47 40 28-13" stroke="#8293c3" stroke-linecap="round"/>
-</g></svg></div>
-    </section>
+<rect x="80" y="40" width="290" height="220" rx="16" fill="#f4f5fb" stroke="#d6dbea"/>
+<rect x="108" y="70" width="150" height="10" rx="5" fill="#d6dbea"/><rect x="108" y="92" width="210" height="8" rx="4" fill="#e3e7f1"/><rect x="108" y="110" width="190" height="8" rx="4" fill="#e3e7f1"/>
+<rect x="108" y="140" width="234" height="28" rx="8" fill="#fff" stroke="#cfe6da"/><circle cx="124" cy="154" r="7" fill="#3a9a72"/><rect x="140" y="150" width="120" height="8" rx="4" fill="#cfe6da"/>
+<rect x="108" y="176" width="234" height="28" rx="8" fill="#fff" stroke="#cfe6da"/><circle cx="124" cy="190" r="7" fill="#3a9a72"/><rect x="140" y="186" width="96" height="8" rx="4" fill="#cfe6da"/>
+<rect x="108" y="212" width="234" height="28" rx="8" fill="#fff" stroke="#f1dfb8"/><circle cx="124" cy="226" r="7" fill="#d4a12a"/><rect x="140" y="222" width="140" height="8" rx="4" fill="#f1dfb8"/>
+<path d="M330 30 362 48v36l-32 18-32-18V48l32-18Z" fill="#283a8c"/><path d="m316 66 10 10 20-20" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+    </div>
+  </div>
+  <ol class="wrap steps3">
+    <li><b>Paste your application</b><p>The text you plan to send to NLnet. Amounts are removed before the AI reads it.</p></li>
+    <li><b>Enter your budget</b><p>It never leaves your device. A short mathematical proof shows it is within the allowed range.</p></li>
+    <li><b>Get your report</b><p>Each rule gets pass, needs info or fail, with the reason and what to fix.</p></li>
+  </ol>
 
-    
+  <div class="wrap" id="how">
+    <div class="head"><p class="eyebrow">How it works</p><h2>Three checks, one private report</h2></div>
+    <div class="explain">
+      <article><h3>The AI reads, without the numbers</h3><p>Before your text is sent, every amount is replaced with [AMOUNT]. The AI (Google Gemini) checks seven of NLnet&rsquo;s published requirements and quotes the part of your text it relied on.</p></article>
+      <article><h3>Your budget is proven, not shown</h3><p>Your browser creates a zero-knowledge proof: a short piece of math that shows your budget is between &euro;5,000 and &euro;50,000 without revealing the number. A budget outside the range cannot produce a proof.</p></article>
+      <article><h3>Anyone can check it</h3><p>The proof is verified on zkVerify, a public network built for checking proofs, so a funder or auditor can confirm it later. You do not need a wallet, an account or any crypto.</p></article>
+    </div>
+    <details style="margin-top:16px"><summary>Technical details</summary><div><p>The budget proof is a Groth16 proof (snarkjs, circom) that a Poseidon commitment opens to a whole-euro amount between 5,000 and 50,000. The verification key and setup are published at <a href="/zk/manifest.json">/zk/manifest.json</a>. Proofs are submitted to zkVerify Volta testnet through the Kurier relayer. The agent returns APPROVE only when all seven rules pass and the proof verifies. Source: <a href="https://github.com/thesithunyein/meritseal">github.com/thesithunyein/meritseal</a>.</p></div></details>
+  </div>
 
-    <section class="workspace wrap" id="receipt" aria-labelledby="sharedTitle" hidden>
-<div class="shared-receipt">
-<p class="eyebrow">MeritSeal receipt</p><h2 id="sharedTitle" tabindex="-1">Grant amount check</h2>
-<p id="sharedStatus" role="status"></p>
-<div id="sharedDetails" hidden>
-<dl><div><dt>Result</dt><dd id="sharedDecision"></dd></div><div><dt>Policy</dt><dd><a href="https://nlnet.nl/propose/">NLnet first-grant amount</a> · v1</dd></div><div><dt>Rule</dt><dd>€5,000–€50,000</dd></div><div><dt>Recorded</dt><dd id="sharedDate"></dd></div></dl>
-<p class="receipt-limit">The checksum checks for edits against the original. This receipt has no issuer signature or zero-knowledge proof.</p>
-<details><summary>Technical details</summary><pre id="sharedJson"></pre></details>
-</div><a class="text-link" href="#review">Check another amount</a>
-</div></section>
-<section class="workspace wrap" id="review" data-product-view="review">
-<div class="workspace-head"><div><h2>Check a grant amount</h2><p><a href="https://nlnet.nl/propose/">NLnet publishes a €5,000–€50,000 range</a> for first grants. This checks the amount only.</p></div></div>
-<div class="workspace-grid">
-<form class="policy-form" id="grantCheck"><h3 class="panel-title"><svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h4l2-6 4 12 2-6h4"/></svg>Amount check</h3><label>Amount (€)<input name="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="12000" required aria-describedby="grantStatus"></label>
-<div><button class="button quiet" type="button" data-amount="12000">Try €12,000</button> <button class="button quiet" type="button" data-amount="55000">Try €55,000</button></div>
-<button class="button primary" type="submit"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h4l2-6 4 12 2-6h4"/></svg><span>Check amount</span></button><output id="grantStatus" aria-live="polite"></output>
-<div id="receiptShare" hidden><button class="button quiet" type="button" id="copyReceiptLink">Copy receipt link</button><a class="button quiet" id="openReceiptLink">Open receipt</a><button class="button quiet" type="button" id="saveReceipt">Save receipt</button></div><output id="shareStatus" aria-live="polite"></output><label id="receiptLinkFallback" hidden>Receipt link<input id="receiptLinkText" type="url" readonly></label><details id="receiptDetails"><summary>View receipt JSON</summary><label>Receipt JSON<textarea id="grantReceipt" rows="7" spellcheck="false" readonly></textarea></label></details></form>
-<form class="policy-form" id="grantVerify"><h3 class="panel-title"><svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 20 6v6c0 4-4 7-8 9-4-2-8-5-8-9V6zM8.5 12l2.5 2.5 4.5-5"/></svg>Receipt check</h3><label>Receipt JSON<textarea id="verifyInput" rows="6" maxlength="8192" spellcheck="false" placeholder="Run a check or paste a receipt" required></textarea></label><button class="button quiet" type="button" id="useReceipt"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 7h11v13H8zM5 16H4V4h11v1"/></svg><span>Use generated receipt</span></button><button class="button primary" type="submit"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3 20 6v6c0 4-4 7-8 9-4-2-8-5-8-9V6zM8.5 12l2.5 2.5 4.5-5"/></svg><span>Check checksum</span></button><output id="verifyStatus" aria-live="polite"></output><p>A checksum can flag edits. An issuer signature would confirm who signed.</p></form>
-</div></section>
-    <section class="workspace wrap" id="screen" data-product-view="screen" aria-labelledby="screenTitle">
-<div class="workspace-head"><div><p class="eyebrow">AI screening agent</p><h2 id="screenTitle">Screen a grant application</h2><p>The MeritSeal agent reads your application and checks it against <a href="https://nlnet.nl/propose/">NLnet&rsquo;s published requirements</a>: technical scope, open licence, open standards, budget breakdown, European dimension, human authorship and plain English. Your budget is proven in range with a zero-knowledge proof. The agent and the AI model never see it.</p></div></div>
-<div class="workspace-grid">
-<form class="policy-form" id="screenForm"><h3 class="panel-title">Application</h3>
-<div><button class="button quiet" type="button" data-sample="strong">Load strong sample</button> <button class="button quiet" type="button" data-sample="weak">Load weak sample</button></div>
-<label>Application text<textarea id="screenText" rows="12" maxlength="12000" spellcheck="true" placeholder="Paste your proposal: summary, licence, budget breakdown, background…" required></textarea></label>
-<label>Requested budget (€), stays on this device<input id="screenBudget" type="text" inputmode="numeric" autocomplete="off" placeholder="24000" required></label>
-<button class="button primary" type="submit" id="screenRun">Screen application</button><output id="screenStatus" aria-live="polite"></output>
-<p>Amounts in the text are replaced with [AMOUNT] before it is sent. The AI&rsquo;s verdicts are advisory; NLnet decides eligibility.</p></form>
-<section class="receipt-output" aria-live="polite"><div id="screenResult" hidden></div></section>
-</div></section>
-    <section class="workspace wrap" id="zk" data-product-view="zk" aria-labelledby="zkTitle">
-<div class="workspace-head"><div><p class="eyebrow">Zero-knowledge receipt</p><h2 id="zkTitle">Prove the amount is in range</h2><p>Your browser proves the requested amount is within <a href="https://nlnet.nl/propose/">NLnet&rsquo;s €5,000&ndash;€50,000</a> first-grant range. The receipt holds the proof and a commitment, never the amount. The proof is then verified on zkVerify.</p></div></div>
-<div class="workspace-grid">
-<form class="policy-form" id="zkForm"><h3 class="panel-title">1 · Create receipt</h3><label>Requested amount (€)<input id="zkAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="12000" required aria-describedby="zkStatus"></label>
-<div><button class="button quiet" type="button" data-zk-amount="12000">Try €12,000</button> <button class="button quiet" type="button" data-zk-amount="55000">Try €55,000</button></div>
-<button class="button primary" type="submit" id="zkProve">Generate proof</button><output id="zkStatus" aria-live="polite"></output>
-<p>Proving runs locally with Groth16 (snarkjs). Out-of-range amounts cannot produce a proof.</p></form>
-<section class="receipt-output" aria-live="polite"><div id="zkResult" hidden></div>
-<form class="policy-form" id="zkVerifyForm" style="padding:0;background:transparent"><h3 class="panel-title">2 · Check a receipt</h3><label>Receipt JSON<textarea id="zkVerifyInput" rows="6" maxlength="20000" spellcheck="false" placeholder="Paste a MeritSeal receipt or open a receipt link" required></textarea></label>
-<div><button class="button quiet" type="button" id="zkUseCurrent">Use my receipt</button> <button class="button primary" type="submit">Verify proof</button></div><output id="zkVerifyStatus" aria-live="polite"></output><output id="zkAgent" aria-live="polite"></output><a id="zkVerifyChain" class="text-link" target="_blank" rel="noopener" hidden>View zkVerify transaction &rarr;</a></form></section>
-</div></section>
-    <section class="workspace wrap" id="audit" data-product-view="audit" aria-labelledby="auditTitle">
-<div class="workspace-head"><div><p class="eyebrow">Batch audit</p><h2 id="auditTitle">Audit a funding round</h2><p>A grant program can show that every request in a round followed the amount rule without publishing a single budget. Paste or load the round&rsquo;s receipts: each proof is verified in your browser, reused commitments are flagged, and only commitments are shown.</p></div></div>
-<div class="workspace-grid">
-<form class="policy-form" id="auditForm"><h3 class="panel-title">Receipts</h3>
-<div><button class="button quiet" type="button" id="auditDemo">Generate demo round</button> <label class="button quiet" style="cursor:pointer">Load receipt files<input id="auditFiles" type="file" accept=".json,application/json" multiple hidden></label></div>
-<label>Receipts (JSON array, JSON objects, or receipt links)<textarea id="auditInput" rows="10" spellcheck="false" placeholder="[ {&quot;type&quot;:&quot;meritseal.zk-receipt.v2&quot;, …}, … ]"></textarea></label>
-<button class="button primary" type="submit">Audit receipts</button><output id="auditStatus" aria-live="polite"></output>
-<p>The demo round creates five real proofs for random in-range budgets, then adds one tampered receipt and one reused receipt. Demo receipts are not sent to zkVerify.</p></form>
-<section class="receipt-output" aria-live="polite"><div id="auditResult" hidden></div></section>
-</div></section>
-    <section class="workspace wrap" id="history" data-product-view="history" aria-labelledby="historyTitle">
-<div class="workspace-head"><div><h2 id="historyTitle" tabindex="-1">Recent checks</h2><p>Saved on this browser. Amounts stay private.</p></div></div>
-<div class="history-panel"><p id="historyEmpty">No saved receipts yet. <a href="#review">Check an amount</a> to save one.</p><ul id="reviewHistory"></ul><p id="historyStatus" role="status"></p></div>
+  <div class="wrap" id="faq" style="padding-top:56px">
+    <div class="head"><p class="eyebrow">FAQ</p><h2>Questions</h2></div>
+    <div class="faq">
+      <details><summary>Do I need a crypto wallet or tokens?</summary><div><p>No. MeritSeal runs in your browser. The public proof record is paid for by the service, and you never sign anything.</p></div></details>
+      <details><summary>Is my budget sent anywhere?</summary><div><p>No. Your budget stays on your device. Only the proof is sent, and the proof does not contain the number. Amounts inside your application text are removed before the text leaves your browser. You can see exactly what the AI received under &ldquo;What the AI saw&rdquo; in your report.</p></div></details>
+      <details><summary>Is this official NLnet?</summary><div><p>No. MeritSeal is an independent tool that checks your text against rules NLnet publishes on <a href="https://nlnet.nl/propose/">nlnet.nl/propose</a>. NLnet makes its own decisions. Treat the report as a pre-check.</p></div></details>
+      <details><summary>Can the AI be wrong?</summary><div><p>Yes. Every verdict includes the quote it relied on, so you can judge it yourself. The budget check is different: it is decided by math, not by the AI.</p></div></details>
+      <details><summary>What is the &ldquo;secret file&rdquo;?</summary><div><p>When your budget is proven, your browser can save a small file with the exact amount and a random number. If a funder later asks you to confirm the real amount, that file proves it matches your proof. Keep it private.</p></div></details>
+      <details><summary>Who sees my application text?</summary><div><p>The text, with amounts removed, is sent to Google Gemini for analysis and is not stored by MeritSeal. On Google&rsquo;s free tier, Google may use prompts to improve its models, so avoid pasting anything you consider confidential beyond the proposal itself.</p></div></details>
+    </div>
+  </div>
 </section>
-    <section class="workspace wrap" id="workspace" data-product-view="workspace">
-      <div class="workspace-head"><div><p class="eyebrow">Local workspace</p><h2>Record a review</h2><p>Save a manual review on this device.</p></div><button class="button quiet" id="clearAll" type="button">Clear manual review</button></div>
-      <div class="workspace-grid">
-        <form class="policy-form" id="policyForm">
-          <label>Policy name<input id="policyName" name="policyName" autocomplete="off" maxlength="80" placeholder="e.g. Community microgrants" required></label>
-          <div class="split"><label>Version<input id="policyVersion" name="policyVersion" autocomplete="off" maxlength="20" value="v1.0" required></label><label>Decision<input id="decision" name="decision" autocomplete="off" maxlength="40" placeholder="Eligible" required></label></div>
-          <label>Checks passed<textarea id="checks" name="checks" rows="4" maxlength="500" placeholder="One check per line&#10;Project is active&#10;Budget is in range&#10;Documents received" required></textarea></label>
-          <label class="private-note">Private review note <span>Not saved in receipt</span><textarea id="privateNote" name="privateNote" rows="3" maxlength="500" placeholder="Optional internal note"></textarea></label>
-          <button class="button primary full" type="submit">Issue receipt</button>
-        </form>
-        <section class="receipt-output" aria-live="polite"><div class="output-empty" id="emptyState"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3 34 11v18L20 37 6 29V11L20 3Z"/><path d="M13 20h14M20 13v14"/></svg><h3>No receipt yet</h3><p>Complete the form to create a receipt.</p></div><div id="receiptResult" hidden></div></section>
-      </div>
-    </section>
-    <section class="system wrap" id="how" data-product-view="how">
-      <div class="section-intro"><h2>From rule to receipt</h2></div>
-      <ol class="steps">
-        <li><span class="step-number">01</span><div><h3>Write the rule</h3><p>Each receipt records the rule version.</p></div><span class="line-icon rule-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M6 4h12v16H6zM9 9h6m-6 4h6m-6 4h4"/></svg></span></li>
-        <li><span class="step-number">02</span><div><h3>Evaluate privately</h3><p>Check the amount in your browser.</p></div><span class="line-icon privacy-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M7 11h10v9H7zM9 11V8a3 3 0 0 1 6 0v3m-3 4v2"/></svg></span></li>
-        <li><span class="step-number">03</span><div><h3>Share the receipt</h3><p>Share the policy, result, and timestamp. The amount stays private.</p></div><span class="line-icon receipt-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M6 4h12v16l-3-2-3 2-3-2-3 2zM9 8h6m-6 4h6"/></svg></span></li>
-      </ol>
-    </section>
-    <section class="privacy wrap" id="privacy" data-product-view="privacy"><div><h2>What stays private</h2></div><div class="privacy-copy"><p>Your amount stays in your browser. Share the rule version and result.</p><div class="boundary"><div><span class="boundary-label">Included in receipt</span><strong>Policy ID &middot; Result &middot; Timestamp &middot; Hash</strong></div><div><span class="boundary-label">Never included</span><strong>Identity &middot; Documents &middot; Private answers</strong></div></div></div></section>
-    <section class="workspace wrap" id="proof" data-product-view="proof"><div class="policy-form"><p class="eyebrow">zkVerify</p><h2>Every receipt carries a real proof</h2><p>Each ZK receipt contains a Groth16 proof that a Poseidon commitment opens to an amount within €5,000&ndash;€50,000. Anyone can verify it in the browser against the published key, and the proof is also submitted to zkVerify through Kurier so the verification is recorded on-chain.</p><p>The <a href="/zk/manifest.json">key manifest</a> lists the circuit, the verification-key hash and how the key was generated.</p><div><a class="button primary" href="#zk"><span>Create a ZK receipt</span></a></div></div></section>
-    <section class="workspace wrap" id="faq" data-product-view="faq"><div class="workspace-head"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 2 20 6.5v10L12 21l-8-4.5v-10zM4 6.5l8 4.5 8-4.5M12 11v10"/></svg><h2>FAQ</h2></div></div>
-<div class="policy-form">
-<details><summary><span>What stays private?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary><p>The eligibility check runs in your browser. The receipt excludes the requested amount and applicant details.</p></details>
-<details><summary><span>What does a receipt show?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary><p>It records the policy version, outcome, and time. Its checksum lets you compare it against the original receipt.</p></details>
-<details><summary><span>Is this a zero-knowledge proof?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary><p>The current receipt uses a SHA-256 checksum. It does not prove the decision or identify the issuer.</p></details>
-<details><summary><span>Which policy does the check use?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary><p>It uses NLnet’s published first-grant amount range. This check covers one criterion. NLnet decides eligibility and awards.</p></details>
-</div></section>
-  </main>
-  <footer class="footer wrap"><a class="brand" href="#top"><svg class="mark" viewBox="0 0 36 36" aria-hidden="true"><path d="M18 3 30 9.8v13.5L18 30 6 23.3V9.8L18 3Z"/><path d="M11.2 13.1 18 17l6.8-3.9M18 17v8.1"/></svg><span>MeritSeal</span></a><p>Private grant reviews</p><p>&#169; 2026 MeritSeal</p></footer>
-  <script>const form = document.getElementById('policyForm');
-const result = document.getElementById('receiptResult');
-const empty = document.getElementById('emptyState');
-const clearAll = document.getElementById('clearAll');
-const storageKey = 'meritseal-last-receipt';
 
-function clean(value) { return value.trim().replace(/\s+/g, ' '); }
-function escapeHTML(value) { const el = document.createElement('div'); el.textContent = value; return el.innerHTML; }
-async function digest(value) { const bytes = new TextEncoder().encode(value); const hash = await crypto.subtle.digest('SHA-256', bytes); return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,'0')).join(''); }
-async function issueReceipt(data) {
-  const receipt = { policy: clean(data.policyName), version: clean(data.policyVersion), decision: clean(data.decision), checks: data.checks.split('\n').map(clean).filter(Boolean), issuedAt: new Date().toISOString() };
-  receipt.hash = await digest(JSON.stringify(receipt));
-  localStorage.setItem(storageKey, JSON.stringify(receipt));
-  renderReceipt(receipt);
-}
-function renderReceipt(receipt) {
-  empty.hidden = true; result.hidden = false;
-  const checks = receipt.checks.map(c => `<li>${escapeHTML(c)}</li>`).join('');
-  result.innerHTML = `<article class="issued-receipt"><span class="result-label">Receipt issued locally</span><h3>${escapeHTML(receipt.policy)}</h3><div class="result-row"><span>Decision</span><b>${escapeHTML(receipt.decision)}</b></div><div class="result-row"><span>Policy version</span><b>${escapeHTML(receipt.version)}</b></div><div class="result-row"><span>Issued</span><b>${new Date(receipt.issuedAt).toLocaleString()}</b></div><div class="result-checks"><span>Checks recorded</span><ul>${checks}</ul></div><div class="result-row"><span>Receipt hash</span><code>${receipt.hash}</code></div><button class="button quiet copy-button" id="copyReceipt" type="button">Copy receipt</button><p class="toast" id="toast" hidden>Receipt copied.</p></article>`;
-  document.getElementById('copyReceipt').addEventListener('click', async () => { await navigator.clipboard.writeText(JSON.stringify(receipt, null, 2)); document.getElementById('toast').hidden = false; });
-}
-form.addEventListener('submit', async event => { event.preventDefault(); const data = Object.fromEntries(new FormData(form)); await issueReceipt(data); document.getElementById('receiptResult').scrollIntoView({behavior:'smooth',block:'center'}); });
-clearAll.addEventListener('click', () => { localStorage.removeItem(storageKey); form.reset(); document.getElementById('policyVersion').value='v1.0'; result.hidden=true; empty.hidden=false; });
-try { const saved = JSON.parse(localStorage.getItem(storageKey)); if (saved) renderReceipt(saved); } catch { localStorage.removeItem(storageKey); }
+<section class="view wrap" data-view="screen" id="screen" aria-labelledby="screenTitle" hidden>
+  <div class="head"><p class="eyebrow">Check my application</p><h2 id="screenTitle">Check your NLnet application</h2><p>Paste your proposal and enter your budget. You get a rule-by-rule report in about 30 seconds.</p></div>
+  <div class="grid">
+    <form class="panel" id="screenForm" novalidate>
+      <h3>1. Your application</h3>
+      <div class="row"><button class="button quiet small" type="button" data-sample="strong">Use a strong example</button><button class="button quiet small" type="button" data-sample="weak">Use a weak example</button></div>
+      <label for="screenText">Application text <span class="hint">Summary, licence, budget breakdown, background&hellip; Plain text is fine.</span></label>
+      <textarea id="screenText" rows="11" maxlength="12000" spellcheck="true" placeholder="Paste the text of your proposal here" aria-describedby="screenStatus"></textarea>
+      <h3>2. Your requested budget</h3>
+      <label for="screenBudget">Total amount in euros <span class="hint">Whole euros, for example 24000.</span></label>
+      <div class="budget"><span aria-hidden="true">&euro;</span><input id="screenBudget" type="text" inputmode="numeric" autocomplete="off" placeholder="24000" aria-describedby="screenStatus"></div>
+      <p class="lock"><span aria-hidden="true">🔒</span><span><b>Stays on this device.</b> Only a proof that it is between &euro;5,000 and &euro;50,000 is shared. The AI never sees it.</span></p>
+      <button class="button primary" type="submit" id="screenRun">Check my application</button>
+      <output id="screenStatus" aria-live="polite"></output>
+    </form>
+    <div aria-live="polite">
+      <div class="placeholder" id="screenPlaceholder"><p><b>Your report will appear here.</b></p><p>Not sure what to paste? Select &ldquo;Use a strong example&rdquo; to see a complete run.</p></div>
+      <div id="screenResult" hidden></div>
+    </div>
+  </div>
+</section>
 
+<section class="view wrap" data-view="audit" id="audit" aria-labelledby="auditTitle" hidden>
+  <div class="head"><p class="eyebrow">For grant programs and auditors</p><h2 id="auditTitle">Check a whole funding round</h2><p>Show that every request in a round stayed within the budget rule without publishing a single budget. Load the round&rsquo;s budget proofs: each one is checked in your browser, copies are flagged, and only anonymous IDs are shown.</p></div>
+  <div class="grid">
+    <form class="panel" id="auditForm">
+      <h3>Budget proofs</h3>
+      <div class="row"><button class="button quiet small" type="button" id="auditDemo">Create an example round</button><label class="button quiet small" style="flex-direction:row;cursor:pointer">Load proof files<input id="auditFiles" type="file" accept=".json,application/json" multiple hidden></label></div>
+      <label for="auditInput">Proofs <span class="hint">Paste proof links or proof files (JSON).</span></label>
+      <textarea id="auditInput" class="code" rows="9" spellcheck="false" placeholder="https://meritseal.vercel.app/#zk-receipt=…"></textarea>
+      <button class="button primary" type="submit">Check all proofs</button><output id="auditStatus" aria-live="polite"></output>
+      <p class="hint">The example round creates five real proofs for random budgets in range, then adds one altered proof and one copy, to show what gets caught. Example proofs are not sent to zkVerify.</p>
+    </form>
+    <div aria-live="polite"><div class="placeholder" id="auditPlaceholder"><p><b>Results will appear here.</b></p><p>Select &ldquo;Create an example round&rdquo; to try it.</p></div><div id="auditResult" hidden></div></div>
+  </div>
+</section>
 
-function evaluateNlnetAmount(amount) {
-  if (!Number.isSafeInteger(amount) || amount < 1) throw new RangeError("Enter a positive whole-euro amount.");
-  return amount >= 5000 && amount <= 50000;
-}
-const grantForm = document.getElementById('grantCheck');
-const grantReceipt = document.getElementById('grantReceipt');
-const verifyInput = document.getElementById('verifyInput');
-const verifyStatus = document.getElementById('verifyStatus');
-const grantStatus = document.getElementById('grantStatus');
-let evaluation = 0;
-let verification = 0;
-function resetVerification() {
-  verification++;
-  verifyStatus.textContent = '';
-}
-verifyInput.addEventListener('input', resetVerification);
-grantForm.querySelectorAll('[data-amount]').forEach(button => {
-  button.addEventListener('click', () => { grantForm.elements.amount.value = button.dataset.amount; grantForm.requestSubmit(); });
-});
-grantForm.addEventListener('submit', async event => {
-  event.preventDefault();
-  const id = ++evaluation;
-  const field = grantForm.elements.amount;
-  const raw = field.value.trim();
-  const amount = Number(raw);
-  if (!/^\d+$/.test(raw) || !Number.isSafeInteger(amount) || amount < 1 || amount > 1000000000) {
-    field.setAttribute('aria-invalid', 'true');
-    grantStatus.dataset.tone = 'fail';
-    grantStatus.textContent = 'Enter a whole-euro amount from 1 to 1,000,000,000.';
-    field.focus();
-    return;
+<section class="view wrap" data-view="zk" id="zk" aria-labelledby="zkTitle" hidden>
+  <div class="head"><p class="eyebrow">Budget proof only</p><h2 id="zkTitle">Prove your budget is in range</h2><p>Create or check a budget proof on its own. Your browser proves the amount is between &euro;5,000 and &euro;50,000 without revealing it, and zkVerify records the check.</p></div>
+  <div class="grid">
+    <form class="panel" id="zkForm"><h3>Create a proof</h3>
+      <label for="zkAmount">Budget (&euro;) <span class="hint">Stays on this device.</span></label><input id="zkAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="12000" aria-describedby="zkStatus">
+      <div class="row"><button class="button quiet small" type="button" data-zk-amount="12000">Try &euro;12,000</button><button class="button quiet small" type="button" data-zk-amount="55000">Try &euro;55,000</button></div>
+      <button class="button primary" type="submit" id="zkProve">Create proof</button><output id="zkStatus" aria-live="polite"></output></form>
+    <div class="panel"><div id="zkResult" hidden></div>
+      <form id="zkVerifyForm" style="display:flex;flex-direction:column;gap:12px"><h3>Check a proof</h3><label for="zkVerifyInput">Proof (JSON) <span class="hint">Opening a proof link fills this in automatically.</span></label><textarea id="zkVerifyInput" class="code" rows="6" maxlength="20000" spellcheck="false" placeholder="Paste a proof here"></textarea>
+        <div class="row"><button class="button quiet small" type="button" id="zkUseCurrent">Use my proof</button><button class="button primary small" type="submit">Check proof</button></div>
+        <output id="zkVerifyStatus" aria-live="polite"></output><output id="zkAgent" aria-live="polite"></output><a id="zkVerifyChain" target="_blank" rel="noopener" hidden>See the public record on zkVerify &rarr;</a></form></div>
+  </div>
+</section>
+
+</main>
+<footer class="wrap footer">
+  <span>MeritSeal &middot; independent tool, not affiliated with NLnet &middot; reports are advisory</span>
+  <nav aria-label="Footer"><a href="#zk">Budget proof only</a><a href="/zk/manifest.json">Proof key</a><a href="https://github.com/thesithunyein/meritseal">Source code</a></nav>
+</footer>
+<script>
+// Minimal router: one view at a time; #how and #faq live on the home view.
+(() => {
+  const views = [...document.querySelectorAll("[data-view]")];
+  const navLinks = [...document.querySelectorAll(".nav nav a")];
+  function show() {
+    const hash = location.hash.slice(1);
+    const name = views.some(v => v.dataset.view === hash) ? hash : "home";
+    for (const v of views) v.hidden = v.dataset.view !== name;
+    for (const a of navLinks) a.toggleAttribute("aria-current", a.getAttribute("href") === "#" + hash);
+    if (name === "home" && (hash === "how" || hash === "faq")) document.getElementById(hash)?.scrollIntoView();
+    else if (!hash.startsWith("zk-receipt=")) window.scrollTo(0, 0);
+    if (name !== "home") document.getElementById(name)?.querySelector("h2")?.focus?.();
   }
-  field.removeAttribute('aria-invalid');
-  const decision = evaluateNlnetAmount(amount) ? 'Within range' : 'Outside range';
-  const receipt = { policy: 'nlnet-first-grant-amount:v1', decision, issuedAt: new Date().toISOString() };
-  const checksum = await digest(JSON.stringify(receipt));
-  if (id !== evaluation) return;
-  const canLoad = !verifyInput.value.trim() || verifyInput.value === grantReceipt.value;
-  grantReceipt.value = JSON.stringify({ ...receipt, checksum }, null, 2);
-  setReceiptLink({ ...receipt, checksum });
-  resetVerification();
-  if (canLoad) verifyInput.value = grantReceipt.value;
-  grantStatus.dataset.tone = decision === 'Within range' ? 'pass' : 'fail';
-  grantStatus.textContent = decision + (decision === 'Within range' ? ' — amount check passed' : ' — amount check failed');
-});
-document.getElementById('useReceipt').addEventListener('click', () => { if (!grantReceipt.value) { verifyStatus.textContent = 'Evaluate a request first.'; return; } resetVerification(); verifyInput.value = grantReceipt.value; verifyInput.focus(); });
-document.getElementById('grantVerify').addEventListener('submit', async event => {
-  event.preventDefault();
-  const status = verifyStatus;
-  const id = ++verification;
-  try {
-    const { policy, decision, issuedAt, checksum } = JSON.parse(verifyInput.value);
-    if (policy !== 'nlnet-first-grant-amount:v1' || !['Within range', 'Outside range'].includes(decision) ||
-        typeof issuedAt !== 'string' || !Number.isFinite(Date.parse(issuedAt)) ||
-        typeof checksum !== 'string' || !/^[a-f0-9]{64}$/.test(checksum)) throw new Error();
-    const actual = await digest(JSON.stringify({ policy, decision, issuedAt }));
-    if (id !== verification) return;
-    status.dataset.tone = actual === checksum ? 'pass' : 'fail';
-    status.textContent = actual === checksum ? 'Checksum matches.' : 'Checksum mismatch. The receipt fields changed.';
-  } catch {
-    status.dataset.tone = 'fail';
-    status.textContent = 'Enter a valid MeritSeal eligibility receipt.';
-  }
-});
-
-const sharedPage = document.getElementById('receipt');
-const sharedDetails = document.getElementById('sharedDetails');
-const sharedStatus = document.getElementById('sharedStatus');
-const openReceiptLink = document.getElementById('openReceiptLink');
-const shareStatus = document.getElementById('shareStatus');
-const linkFallback = document.getElementById('receiptLinkFallback');
-let displayVersion = 0;
-
-function receiptUrl(receipt) {
-  const url = new URL('/', location.origin);
-  url.hash = 'receipt=' + encodeURIComponent(JSON.stringify(receipt));
-  return url.href;
-}
-
-function setReceiptLink(receipt) {
-  openReceiptLink.href = receiptUrl(receipt);
-  document.getElementById('receiptShare').hidden = false;
-  shareStatus.textContent = '';
-  linkFallback.hidden = true;
-}
-
-document.getElementById('copyReceiptLink').addEventListener('click', async () => {
-  const link = openReceiptLink.href;
-  if (!link) return;
-  try {
-    await navigator.clipboard.writeText(link);
-    if (link === openReceiptLink.href) shareStatus.textContent = 'Receipt link copied.';
-  } catch {
-    if (link !== openReceiptLink.href) return;
-    const field = document.getElementById('receiptLinkText');
-    field.value = link;
-    linkFallback.hidden = false;
-    field.select();
-    shareStatus.textContent = 'Copy the link below.';
-  }
-});
-
-async function showSharedReceipt() {
-  const id = ++displayVersion;
-  const fragment = location.hash;
-  sharedPage.hidden = !fragment.startsWith('#receipt=');
-  sharedDetails.hidden = true;
-  if (sharedPage.hidden) return;
-  sharedStatus.textContent = 'Checking receipt…';
-  try {
-    if (fragment.length > 2048) throw new Error();
-    const data = JSON.parse(decodeURIComponent(fragment.slice('#receipt='.length)));
-    const { policy, decision, issuedAt, checksum } = data;
-    if (Object.keys(data).length !== 4 ||
-        policy !== 'nlnet-first-grant-amount:v1' ||
-        !['Within range', 'Outside range'].includes(decision) ||
-        typeof issuedAt !== 'string' || !Number.isFinite(Date.parse(issuedAt)) ||
-        new Date(issuedAt).toISOString() !== issuedAt ||
-        typeof checksum !== 'string' || !/^[0-9a-f]{64}$/.test(checksum)) throw new Error();
-    const actual = await digest(JSON.stringify({ policy, decision, issuedAt }));
-    if (id !== displayVersion) return;
-    if (actual !== checksum) {
-      sharedStatus.textContent = 'Checksum mismatch. Ask the sender for a fresh link.';
-      return;
-    }
-    sharedStatus.textContent = 'Checksum matches.';
-    document.getElementById('sharedDecision').textContent = decision;
-    document.getElementById('sharedDate').textContent = new Date(issuedAt).toLocaleString();
-    document.getElementById('sharedJson').textContent = JSON.stringify({ policy, decision, issuedAt, checksum }, null, 2);
-    sharedDetails.hidden = false;
-  } catch {
-    if (id === displayVersion) sharedStatus.textContent = 'Invalid receipt link. Ask the sender for a fresh link.';
-  } finally {
-    if (id === displayVersion) {
-      document.getElementById('sharedTitle').focus({ preventScroll: true });
-      sharedPage.scrollIntoView({ block: 'start' });
-    }
-  }
-}
-window.addEventListener('hashchange', showSharedReceipt);
-showSharedReceipt();
-
-const historyKey = 'meritseal-amount-history:v1';
-const historyList = document.getElementById('reviewHistory');
-const historyEmpty = document.getElementById('historyEmpty');
-const historyStatus = document.getElementById('historyStatus');
-const saveReceiptButton = document.getElementById('saveReceipt');
-
-function readHistory() {
-  const rows = JSON.parse(localStorage.getItem(historyKey) || '[]');
-  if (!Array.isArray(rows)) return [];
-  return rows.slice(0, 30).filter(row => row &&
-    row.policy === 'nlnet-first-grant-amount:v1' &&
-    ['Within range', 'Outside range'].includes(row.decision) &&
-    typeof row.issuedAt === 'string' && Number.isFinite(Date.parse(row.issuedAt)) &&
-    typeof row.checksum === 'string' && /^[a-f0-9]{64}$/.test(row.checksum)
-  ).map(({ policy, decision, issuedAt, checksum }) => ({ policy, decision, issuedAt, checksum }));
-}
-function renderHistory() {
-  historyList.replaceChildren();
-  try {
-    const rows = readHistory();
-    historyEmpty.hidden = rows.length > 0;
-    for (const row of rows) {
-      const item = document.createElement('li');
-      const description = document.createElement('div');
-      const result = document.createElement('strong');
-      result.textContent = row.decision;
-      const date = document.createElement('time');
-      date.dateTime = row.issuedAt;
-      date.textContent = new Date(row.issuedAt).toLocaleString();
-      const open = document.createElement('a');
-      open.className = 'button quiet';
-      open.textContent = 'Open receipt';
-      open.href = receiptUrl(row);
-      const remove = document.createElement('button');
-      remove.className = 'button quiet';
-      remove.type = 'button';
-      remove.textContent = 'Remove';
-      remove.addEventListener('click', () => {
-        try {
-          localStorage.setItem(historyKey, JSON.stringify(readHistory().filter(saved => saved.checksum !== row.checksum)));
-          renderHistory();
-          (historyList.querySelector('button') || document.getElementById('historyTitle')).focus();
-          historyStatus.textContent = 'Receipt removed from this browser.';
-        } catch {
-          historyStatus.textContent = 'Could not remove this receipt.';
-        }
-      });
-      description.append(result, date);
-      const actions = document.createElement('div');
-      actions.append(open, remove);
-      item.append(description, actions);
-      historyList.append(item);
-    }
-  } catch {
-    historyEmpty.hidden = true;
-    historyStatus.textContent = 'Review history is unavailable in this browser.';
-  }
-}
-saveReceiptButton.addEventListener('click', () => {
-  try {
-    const { policy, decision, issuedAt, checksum } = JSON.parse(grantReceipt.value);
-    const rows = readHistory();
-    if (!rows.some(row => row.checksum === checksum)) {
-      localStorage.setItem(historyKey, JSON.stringify([{ policy, decision, issuedAt, checksum }, ...rows].slice(0, 30)));
-    }
-    renderHistory();
-    shareStatus.textContent = 'Saved to Recent checks.';
-  } catch {
-    shareStatus.textContent = 'Could not save. You can still copy the receipt link.';
-  }
-});
-renderHistory();
-
-const productViews = Array.from(document.querySelectorAll('[data-product-view]'));
-const landingViews = new Set(['home', 'how', 'privacy', 'proof', 'faq']);
-const productIds = new Set(productViews.map(view => view.dataset.productView));
-function showProductView(moveFocus = false) {
-  const hash = location.hash.slice(1);
-  const isReceipt = hash.startsWith('receipt=');
-  const active = productIds.has(hash) ? hash : 'home';
-  const onLanding = landingViews.has(active);
-  for (const view of productViews) {
-    const name = view.dataset.productView;
-    view.hidden = isReceipt || (onLanding ? !landingViews.has(name) : name !== active);
-  }
-  for (const link of document.querySelectorAll('.nav a[href^="#"]')) {
-    if (!isReceipt && productIds.has(hash) && link.hash === location.hash) link.setAttribute('aria-current', onLanding ? 'location' : 'page');
-    else link.removeAttribute('aria-current');
-  }
-  if (isReceipt) return;
-  const view = productViews.find(section => section.dataset.productView === active);
-  const heading = view.querySelector('h1,h2');
-  if (moveFocus) {
-    heading.setAttribute('tabindex', '-1');
-    heading.focus({ preventScroll: true });
-  }
-  if (moveFocus && active === 'home') window.scrollTo(0, 0);
-  else if (active !== 'home') view.scrollIntoView({ block: 'start' });
-}
-window.addEventListener('hashchange', () => showProductView(true));
-showProductView();
-</script><script src="/zk-receipt.js" defer></script></body>
+  window.addEventListener("hashchange", show);
+  show();
+})();
+</script>
+<script src="/zk-receipt.js" defer></script>
+</body>
 </html>
-
