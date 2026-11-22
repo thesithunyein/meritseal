@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://meritseal.vercel.app/#screen"><img src="https://img.shields.io/badge/Live-Check%20an%20application-283A8C" alt="Check an application"></a>
   <a href="https://meritseal.vercel.app/#audit"><img src="https://img.shields.io/badge/Live-Audit%20a%20round-16715B" alt="Audit a round"></a>
-  <img src="https://img.shields.io/badge/tests-14%20passing-16715B" alt="14 tests passing">
+  <img src="https://img.shields.io/badge/tests-15%20passing-16715B" alt="15 tests passing">
   <img src="https://img.shields.io/badge/license-MIT-475569" alt="MIT license">
 </p>
 
@@ -121,12 +121,13 @@ It fails closed: malformed proofs return `INVALID_RECEIPT`, a missing verifier r
 
 ## Tests
 
-`npm test` runs 14 tests ([`agent/server.test.mjs`](./agent/server.test.mjs)), including:
+`npm test` runs 15 tests ([`agent/server.test.mjs`](./agent/server.test.mjs)), including:
 - **the AI model never receives budget amounts**: the request sent to Gemini is inspected, and `24,000`, `8,400` and `€60` must not appear;
 - model output is constrained to known rules and verdicts (an injected rule or an unknown verdict is ignored);
 - the agent approves only with all rules passed **and** a valid budget proof;
 - Agent Games HMAC signing, preflight, idempotency, and rejection of malformed or unsigned requests;
 - malformed proofs are rejected and the agent fails closed without a verifier;
+- Gemini is retried once on a timeout, 429 or 5xx;
 - only whitelisted files are served.
 
 `npm run zk:check` proves €5,000, €12,000 and €50,000, confirms €4,999, €50,001 and €70,000 cannot be proven, and confirms a changed commitment fails verification.
@@ -154,7 +155,7 @@ agent/
   screen.mjs          AI screening: NLnet rules, amount redaction, Gemini call, output validation
   policy.mjs          Decisions: screening + budget proof, proof verification, legacy rule checks
   kurier.mjs          zkVerify submission through Kurier (register key, submit, status)
-  server.test.mjs     14 tests
+  server.test.mjs     15 tests
   public/index.html   The web app (applicant flow, audit, budget proof)
   public/zk-receipt.js  Browser logic: redaction, proving, report, audit
   public/zk/          Circuit WASM, proving key, verification key, manifest

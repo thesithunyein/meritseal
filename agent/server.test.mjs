@@ -160,3 +160,17 @@ test("screening endpoint is off without a Gemini key", async (t) => {
   assert.equal(res.status, 503);
   assert.equal((await (await fetch(`${base}/api/screen/rules`)).json()).rules.length, 7);
 });
+
+test("Gemini is retried once on a 503 and the result is used", async () => {
+  process.env.GEMINI_API_KEY = "test-key";
+  let calls = 0;
+  const flaky = async () => {
+    calls++;
+    if (calls === 1) return new Response(JSON.stringify({ error: { code: 503 } }), { status: 503 });
+    return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify({ rules: [] }) }] } }] }), { status: 200 });
+  };
+  const result = await screenApplication(sampleApplication, { fetchImpl: flaky });
+  delete process.env.GEMINI_API_KEY;
+  assert.equal(calls, 2);
+  assert.equal(result.rules.length, 7);
+});

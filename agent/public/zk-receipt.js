@@ -264,7 +264,8 @@ This application was generated with our own AI tool to show how powerful it is.`
     const list = el("ol", { class: "progress", "aria-label": "Progress" });
     for (const [id, label] of STEPS) {
       if (id === "record" && state.budgetFailed) continue;
-      list.append(el("li", { "data-state": state.steps[id] ?? "pending" }, label));
+      const slow = id === "ai" && state.slow && state.steps.ai === "active";
+      list.append(el("li", { "data-state": state.steps[id] ?? "pending" }, slow ? `${label} (taking a little longer than usual…)` : label));
     }
     return list;
   }
@@ -272,6 +273,7 @@ This application was generated with our own AI tool to show how powerful it is.`
   function renderScreen(state) {
     const out = $("screenResult"), placeholder = $("screenPlaceholder");
     out.replaceChildren();
+    out.parentElement.classList.toggle("static", Boolean(state?.result));
     if (!state) { out.hidden = true; placeholder.hidden = false; return; }
     out.hidden = false; placeholder.hidden = true;
     const panel = el("div", { class: "panel" });
@@ -369,8 +371,10 @@ This application was generated with our own AI tool to show how powerful it is.`
       const made = await makeReceipt(raw);
       if (made) { state.receipt = made.receipt; state.opening = made.opening; current = made; } else { state.budgetFailed = true; state.budgetLow = Number(raw) < 5000; }
       state.steps.prove = "done"; state.steps.ai = "active"; renderScreen(state);
+      const slowTimer = setTimeout(() => { if (state.steps.ai === "active") { state.slow = true; renderScreen(state); } }, 15000);
       const res = await fetch("/api/screen", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ application_text: redacted, receipt: made ? { proof: made.receipt.proof, public_signals: made.receipt.public_signals } : undefined }) });
       const body = await res.json().catch(() => ({}));
+      clearTimeout(slowTimer);
       if (!res.ok) {
         state.steps.ai = "failed";
         state.error = res.status === 429 ? "Too many checks in a short time. Wait a minute, then try again." : res.status === 400 && body.error === "application_too_short" ? "The application is too short to assess. Add more detail and try again." : "The AI agent is busy or unavailable right now. Your budget was not shared. Please try again in a moment.";

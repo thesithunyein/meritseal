@@ -80,19 +80,27 @@ export async function screenApplication(applicationText, { fetchImpl = fetch } =
   if (text.length < 80) throw new Error("application_too_short");
   const { redacted, count } = redactAmounts(text);
   const model = geminiModel();
-  const started = Date.now();
-  const response = await fetchImpl(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY ?? "" },
-    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: buildPrompt(redacted) }] }], generationConfig: { temperature: 0 } }),
-    signal: AbortSignal.timeout(45000)
-  });
-  const body = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    console.error(`[gemini] ${model} -> ${response.status}: ${JSON.stringify(body).slice(0, 300)}`);
-    throw new Error(`gemini_${response.status}`);
+  // Free-tier latency spikes happen: try twice, 25 s each, retrying only on timeouts, 429 and 5xx.
+  let body;
+  for (let attempt = 1; ; attempt++) {
+    const started = Date.now();
+    try {
+      const response = await fetchImpl(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY ?? "" },
+        body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: buildPrompt(redacted) }] }], generationConfig: { temperature: 0 } }),
+        signal: AbortSignal.timeout(25000)
+      });
+      body = await response.json().catch(() => ({}));
+      if (response.ok) { console.log(`[gemini] ${model} -> 200 in ${Date.now() - started}ms (attempt ${attempt})`); break; }
+      console.error(`[gemini] ${model} -> ${response.status} (attempt ${attempt}): ${JSON.stringify(body).slice(0, 300)}`);
+      if (attempt >= 2 || !(response.status === 429 || response.status >= 500)) throw new Error(`gemini_${response.status}`);
+    } catch (error) {
+      if (String(error.message).startsWith("gemini_")) throw error;
+      console.error(`[gemini] ${model} ${error.name} after ${Date.now() - started}ms (attempt ${attempt})`);
+      if (attempt >= 2) throw new Error(error.name === "TimeoutError" ? "gemini_timeout" : "gemini_network");
+    }
   }
   const output = (body.candidates?.[0]?.content?.parts ?? []).map(p => p.text ?? "").join("");
-  console.log(`[gemini] ${model} -> 200 in ${Date.now() - started}ms`);
   return { ...normalizeAssessment(parseModelJson(output)), model, amounts_redacted: count };
 }
