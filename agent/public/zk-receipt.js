@@ -315,7 +315,7 @@ This application was generated with our own AI tool to show how powerful it is.`
     };
     const group = (title, items, open = true) => {
       if (!items.length) return;
-      const list = el("ol", { class: "rules" }); items.forEach(c => list.append(ruleItem(c)));
+      const list = el("ol", { class: "rules" }); items.forEach((c, i) => { const li = ruleItem(c); li.style.setProperty("--i", i); list.append(li); });
       if (open) { panel.append(el("p", { class: "group-title" }, title), list); }
       else { const d = el("details"); d.append(el("summary", {}, title)); const wrap = el("div"); wrap.append(list); d.append(wrap); panel.append(d); }
     };
@@ -388,15 +388,16 @@ This application was generated with our own AI tool to show how powerful it is.`
     }
   }
 
-  function loadSample(name) {
+  // Examples fill the form and run the check straight away: one click to a full report.
+  function runSample(name) {
+    if ($("screenRun").disabled) return;
     const sample = SAMPLES[name];
     $("screenText").value = sample.text; $("screenBudget").value = sample.budget;
-    status($("screenStatus"), `${name === "strong" ? "A strong" : "A weak"} example is filled in. Select “Check my application”.`);
-    renderScreen(null);
+    $("screenForm").requestSubmit();
   }
   $("screenForm").addEventListener("submit", screenApplication);
-  for (const btn of document.querySelectorAll("[data-sample]")) btn.addEventListener("click", () => loadSample(btn.dataset.sample));
-  for (const link of document.querySelectorAll("[data-try-sample]")) link.addEventListener("click", () => setTimeout(() => { loadSample(link.dataset.trySample); $("screenRun").focus(); }, 0));
+  for (const btn of document.querySelectorAll("[data-sample]")) btn.addEventListener("click", () => runSample(btn.dataset.sample));
+  for (const link of document.querySelectorAll("[data-try-sample]")) link.addEventListener("click", () => setTimeout(() => runSample(link.dataset.trySample), 50));
 
   // ---- Batch audit ---------------------------------------------------------------------------
   // An auditor checks a whole funding round: every proof valid, no reused commitments, no amounts.
@@ -444,7 +445,7 @@ This application was generated with our own AI tool to show how powerful it is.`
     table.append(el("thead")); table.tHead.append(head);
     const tbody = el("tbody");
     for (const r of rows) {
-      const tr = el("tr", { "data-status": r.status });
+      const tr = el("tr", { "data-status": r.status }); tr.style.setProperty("--i", r.n);
       tr.append(el("td", {}, String(r.n)), el("td", {}, r.commitment ? short(String(r.commitment)) : "—"));
       const res = el("td"); res.append(el("b", {}, { VALID: "Valid", INVALID: "Rejected", DUPLICATE: "Copy" }[r.status]), el("small", {}, r.note)); tr.append(res);
       const zk = el("td");
@@ -454,8 +455,16 @@ This application was generated with our own AI tool to show how powerful it is.`
       tbody.append(tr);
     }
     table.append(tbody);
-    out.append(summary, table);
+    const scroll = el("div", { class: "table-scroll" }); scroll.append(table);
+    const panel = el("div", { class: "panel" }); panel.append(summary, scroll);
+    out.replaceChildren(panel);
     out.hidden = false;
+    // Count up to the result for a little feedback (skipped when reduced motion is preferred).
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      let n = 0; const total = rows.length;
+      const tick = () => { big.textContent = `${n} of ${total} within the budget rule`; if (n++ < valid) setTimeout(tick, 90); };
+      tick();
+    }
   }
 
   async function runAudit(event) {

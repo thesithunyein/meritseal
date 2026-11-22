@@ -89,7 +89,57 @@ details>div,details>pre{margin:0;padding:0 14px 14px}details pre{white-space:pre
 .footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding:28px 0 40px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.footer nav{display:flex;flex-wrap:wrap;gap:16px}
 [hidden]{display:none!important}
 @media(max-width:900px){.hero,.grid{grid-template-columns:minmax(0,1fr)}.seal-art{display:none}.steps3,.explain{grid-template-columns:minmax(0,1fr)}}
-  </style>
+  
+/* ---- layout refinements ---- */
+section.view{padding:28px 0 64px}
+.head h2{font-size:clamp(28px,3.4vw,40px)}
+.head.center{margin-inline:auto;text-align:center}.head.center p:last-child{margin-inline:auto;max-width:560px}
+.band{padding:64px 0 8px}
+#faq{padding-top:64px}.faq{margin-inline:auto}
+.explain article{text-align:left;transition:transform .25s ease,box-shadow .25s ease}.explain article:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgb(23 33 58/.08)}
+.explain .icon{display:inline-grid;place-items:center;width:42px;height:42px;margin-bottom:12px;border-radius:12px;background:var(--soft);font-size:20px}
+details.tech{max-width:820px;margin:18px auto 0}
+.cta{margin:72px auto 0;padding:40px 24px;border-radius:18px;background:linear-gradient(135deg,#eef0fb,#eaf5ef);text-align:center}.cta h2{margin:0 0 6px;font-size:clamp(26px,3vw,34px)}.cta p{margin:0 0 18px;color:var(--ink-2)}
+.try{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:var(--wash);font-size:14px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #d4d9e6;border-radius:999px;background:#fff;color:var(--ink);font:700 13px var(--sans);cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+.chip:hover{transform:translateY(-1px);border-color:var(--accent);box-shadow:0 4px 12px rgb(40 58 140/.12)}.chip i{font-style:normal;color:var(--green)}.chip[data-sample=weak] i{color:#b26b12}
+.lbl{display:flex;align-items:center;gap:6px;font-size:15px}.step-n{display:inline-grid;place-items:center;width:22px;height:22px;margin-right:4px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px}
+label .step-n{display:inline-grid}
+label{flex-direction:column}
+.lock-inline{font-weight:700;color:var(--ink-2)}
+#screenText{max-height:42vh}
+.submit-row{display:flex;flex-wrap:wrap;gap:10px}.submit-row .budget{flex:1 1 180px}.submit-row .go{flex:1 1 220px}
+.grid>div[aria-live]{position:sticky;top:16px}
+.placeholder{display:flex;flex-direction:column;align-items:center;gap:4px;padding:40px 24px;background:linear-gradient(180deg,#fbfbfd,#fff)}.placeholder p{margin:0}
+.ph-icon{width:54px;height:54px;margin-bottom:10px;color:#9aa6c8}.ph-icon svg{width:100%;height:100%}
+.button{will-change:transform}.button:hover{transform:translateY(-1px)}.primary:hover{box-shadow:0 8px 20px rgb(40 58 140/.25)}
+.go{position:relative;overflow:hidden}.go::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgb(255 255 255/.28) 50%,transparent 70%);transform:translateX(-100%);animation:shine 3.2s ease-in-out 1.2s infinite}
+.nav{position:sticky;top:0;z-index:5;background:rgb(255 254 253/.92);backdrop-filter:blur(8px)}
+.nav nav a{position:relative;padding:4px 0}.nav nav a::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;border-radius:2px;background:var(--accent);transform:scaleX(0);transition:transform .2s}.nav nav a:hover::after,.nav nav a[aria-current]::after{transform:scaleX(1)}
+details>summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"+";font:600 20px var(--sans);color:var(--accent);transition:transform .25s}details[open]>summary::after{transform:rotate(45deg)}
+.faq details{transition:box-shadow .2s}.faq details:hover{box-shadow:0 6px 18px rgb(23 33 58/.06)}.faq details>summary{padding:16px 18px;font-size:16px}.faq details>div{padding:0 18px 16px}
+details[open]>div,details[open]>pre{animation:fadeUp .3s ease both}
+/* ---- motion ---- */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.92)}60%{transform:scale(1.02)}100%{opacity:1;transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shine{0%{transform:translateX(-100%)}40%,100%{transform:translateX(100%)}}
+@keyframes draw{from{stroke-dashoffset:40}to{stroke-dashoffset:0}}
+section.view:not([hidden]){animation:fadeUp .45s cubic-bezier(.2,.7,.2,1) both}
+.hero h1,.hero .lede,.hero .actions,.hero .trust{animation:fadeUp .6s cubic-bezier(.2,.7,.2,1) both}.hero .lede{animation-delay:.08s}.hero .actions{animation-delay:.16s}.hero .trust{animation-delay:.24s}
+.seal-art svg{animation:float 6s ease-in-out infinite}
+.hrow{opacity:0;animation:fadeUp .5s ease var(--d) both}
+.hbadge{transform-origin:330px 66px;animation:pop .5s ease 1.4s both}.hcheck{stroke-dasharray:40;animation:draw .5s ease 1.7s both}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}.reveal.in{opacity:1;transform:none}
+.explain article.reveal:nth-child(2){transition-delay:.08s}.explain article.reveal:nth-child(3){transition-delay:.16s}
+.verdict-card{animation:pop .45s cubic-bezier(.2,.7,.2,1) both}
+.rules li{animation:fadeUp .4s ease both;animation-delay:calc(var(--i,0) * 60ms)}
+.progress li[data-state=done]::before{animation:pop .3s ease both}
+.audit-table tbody tr{animation:fadeUp .35s ease both;animation-delay:calc(var(--i,0) * 50ms)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal,.hrow{opacity:1;transform:none}}
+@media(max-width:900px){.grid>div[aria-live]{position:static}.nav nav{gap:14px;overflow-x:auto;flex-wrap:nowrap;max-width:100%;padding-bottom:4px}.nav{padding:10px 0}.hero{padding:36px 0 32px}}
+</style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -99,13 +149,13 @@ details>div,details>pre{margin:0;padding:0 14px 14px}details pre{white-space:pre
 </header>
 <main id="main">
 
-<section class="view" data-view="home" aria-labelledby="homeTitle">
+<section class="view" data-view="home" aria-labelledby="homeTitle" style="padding-top:0">
   <div class="wrap hero">
     <div>
       <p class="eyebrow">For NLnet grant applicants</p>
       <h1 id="homeTitle">Check your grant application, <em>keep your budget private.</em></h1>
       <p class="lede">An AI agent reads your proposal, checks it against NLnet&rsquo;s published rules and tells you what to fix before you submit. Your budget is checked on your own device. The AI never sees it.</p>
-      <div class="actions"><a class="button primary" href="#screen">Check my application</a><a class="button quiet" href="#screen" data-try-sample="strong">Try it with an example</a></div>
+      <div class="actions"><a class="button primary" href="#screen">Check my application</a><a class="button quiet" href="#screen" data-try-sample="strong">See an example</a></div>
       <ul class="trust"><li>Free</li><li>No wallet or crypto needed</li><li>About 30 seconds</li></ul>
     </div>
     <div class="seal-art" aria-hidden="true">
@@ -113,32 +163,32 @@ details>div,details>pre{margin:0;padding:0 14px 14px}details pre{white-space:pre
 <path d="M20 45V20h25m360 0h25v25M20 255v25h25m360 0h25v-25" stroke="#a3afd2"/>
 <rect x="80" y="40" width="290" height="220" rx="16" fill="#f4f5fb" stroke="#d6dbea"/>
 <rect x="108" y="70" width="150" height="10" rx="5" fill="#d6dbea"/><rect x="108" y="92" width="210" height="8" rx="4" fill="#e3e7f1"/><rect x="108" y="110" width="190" height="8" rx="4" fill="#e3e7f1"/>
-<rect x="108" y="140" width="234" height="28" rx="8" fill="#fff" stroke="#cfe6da"/><circle cx="124" cy="154" r="7" fill="#3a9a72"/><rect x="140" y="150" width="120" height="8" rx="4" fill="#cfe6da"/>
-<rect x="108" y="176" width="234" height="28" rx="8" fill="#fff" stroke="#cfe6da"/><circle cx="124" cy="190" r="7" fill="#3a9a72"/><rect x="140" y="186" width="96" height="8" rx="4" fill="#cfe6da"/>
-<rect x="108" y="212" width="234" height="28" rx="8" fill="#fff" stroke="#f1dfb8"/><circle cx="124" cy="226" r="7" fill="#d4a12a"/><rect x="140" y="222" width="140" height="8" rx="4" fill="#f1dfb8"/>
-<path d="M330 30 362 48v36l-32 18-32-18V48l32-18Z" fill="#283a8c"/><path d="m316 66 10 10 20-20" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="hrow" style="--d:.5s"><rect x="108" y="140" width="234" height="28" rx="8" fill="#fff" stroke="#cfe6da"/><circle cx="124" cy="154" r="7" fill="#3a9a72"/><rect x="140" y="150" width="120" height="8" rx="4" fill="#cfe6da"/></g>
+<g class="hrow" style="--d:.8s"><rect x="108" y="176" width="234" height="28" rx="8" fill="#fff" stroke="#cfe6da"/><circle cx="124" cy="190" r="7" fill="#3a9a72"/><rect x="140" y="186" width="96" height="8" rx="4" fill="#cfe6da"/></g>
+<g class="hrow" style="--d:1.1s"><rect x="108" y="212" width="234" height="28" rx="8" fill="#fff" stroke="#f1dfb8"/><circle cx="124" cy="226" r="7" fill="#d4a12a"/><rect x="140" y="222" width="140" height="8" rx="4" fill="#f1dfb8"/></g>
+<g class="hbadge"><path d="M330 30 362 48v36l-32 18-32-18V48l32-18Z" fill="#283a8c"/><path class="hcheck" d="m316 66 10 10 20-20" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
 </svg>
     </div>
   </div>
-  <ol class="wrap steps3">
+  <ol class="wrap steps3 reveal">
     <li><b>Paste your application</b><p>The text you plan to send to NLnet. Amounts are removed before the AI reads it.</p></li>
     <li><b>Enter your budget</b><p>It never leaves your device. A short mathematical proof shows it is within the allowed range.</p></li>
     <li><b>Get your report</b><p>Each rule gets pass, needs info or fail, with the reason and what to fix.</p></li>
   </ol>
 
-  <div class="wrap" id="how">
-    <div class="head"><p class="eyebrow">How it works</p><h2>Three checks, one private report</h2></div>
+  <div class="wrap band" id="how">
+    <div class="head center reveal"><p class="eyebrow">How it works</p><h2>Three checks, one private report</h2><p>Each part does one job, and your budget never travels.</p></div>
     <div class="explain">
-      <article><h3>The AI reads, without the numbers</h3><p>Before your text is sent, every amount is replaced with [AMOUNT]. The AI (Google Gemini) checks seven of NLnet&rsquo;s published requirements and quotes the part of your text it relied on.</p></article>
-      <article><h3>Your budget is proven, not shown</h3><p>Your browser creates a zero-knowledge proof: a short piece of math that shows your budget is between &euro;5,000 and &euro;50,000 without revealing the number. A budget outside the range cannot produce a proof.</p></article>
-      <article><h3>Anyone can check it</h3><p>The proof is verified on zkVerify, a public network built for checking proofs, so a funder or auditor can confirm it later. You do not need a wallet, an account or any crypto.</p></article>
+      <article class="reveal"><span class="icon" aria-hidden="true">🤖</span><h3>The AI reads, without the numbers</h3><p>Before your text is sent, every amount is replaced with [AMOUNT]. The AI (Google Gemini) checks seven of NLnet&rsquo;s published requirements and quotes the part of your text it relied on.</p></article>
+      <article class="reveal"><span class="icon" aria-hidden="true">🔒</span><h3>Your budget is proven, not shown</h3><p>Your browser creates a zero-knowledge proof: a short piece of math that shows your budget is between &euro;5,000 and &euro;50,000 without revealing the number. A budget outside the range cannot produce a proof.</p></article>
+      <article class="reveal"><span class="icon" aria-hidden="true">🌐</span><h3>Anyone can check it</h3><p>The proof is verified on zkVerify, a public network built for checking proofs, so a funder or auditor can confirm it later. You do not need a wallet, an account or any crypto.</p></article>
     </div>
-    <details style="margin-top:16px"><summary>Technical details</summary><div><p>The budget proof is a Groth16 proof (snarkjs, circom) that a Poseidon commitment opens to a whole-euro amount between 5,000 and 50,000. The verification key and setup are published at <a href="/zk/manifest.json">/zk/manifest.json</a>. Proofs are submitted to zkVerify Volta testnet through the Kurier relayer. The agent returns APPROVE only when all seven rules pass and the proof verifies. Source: <a href="https://github.com/thesithunyein/meritseal">github.com/thesithunyein/meritseal</a>.</p></div></details>
+    <details class="tech reveal"><summary>Technical details</summary><div><p>The budget proof is a Groth16 proof (snarkjs, circom) that a Poseidon commitment opens to a whole-euro amount between 5,000 and 50,000. The verification key and setup are published at <a href="/zk/manifest.json">/zk/manifest.json</a>. Proofs are submitted to zkVerify Volta testnet through the Kurier relayer. The agent returns APPROVE only when all seven rules pass and the proof verifies. Source: <a href="https://github.com/thesithunyein/meritseal">github.com/thesithunyein/meritseal</a>.</p></div></details>
   </div>
 
-  <div class="wrap" id="faq" style="padding-top:56px">
-    <div class="head"><p class="eyebrow">FAQ</p><h2>Questions</h2></div>
-    <div class="faq">
+  <div class="wrap" id="faq">
+    <div class="head center reveal"><p class="eyebrow">FAQ</p><h2>Common questions</h2></div>
+    <div class="faq reveal">
       <details><summary>Do I need a crypto wallet or tokens?</summary><div><p>No. MeritSeal runs in your browser. The public proof record is paid for by the service, and you never sign anything.</p></div></details>
       <details><summary>Is my budget sent anywhere?</summary><div><p>No. Your budget stays on your device. Only the proof is sent, and the proof does not contain the number. Amounts inside your application text are removed before the text leaves your browser. You can see exactly what the AI received under &ldquo;What the AI saw&rdquo; in your report.</p></div></details>
       <details><summary>Is this official NLnet?</summary><div><p>No. MeritSeal is an independent tool that checks your text against rules NLnet publishes on <a href="https://nlnet.nl/propose/">nlnet.nl/propose</a>. NLnet makes its own decisions. Treat the report as a pre-check.</p></div></details>
@@ -147,25 +197,22 @@ details>div,details>pre{margin:0;padding:0 14px 14px}details pre{white-space:pre
       <details><summary>Who sees my application text?</summary><div><p>The text, with amounts removed, is sent to Google Gemini for analysis and is not stored by MeritSeal. On Google&rsquo;s free tier, Google may use prompts to improve its models, so avoid pasting anything you consider confidential beyond the proposal itself.</p></div></details>
     </div>
   </div>
+  <div class="wrap cta reveal"><h2>Ready to check yours?</h2><p>Free, private, and no wallet needed.</p><a class="button primary go" href="#screen">Check my application</a></div>
 </section>
 
 <section class="view wrap" data-view="screen" id="screen" aria-labelledby="screenTitle" hidden>
   <div class="head"><p class="eyebrow">Check my application</p><h2 id="screenTitle">Check your NLnet application</h2><p>Paste your proposal and enter your budget. You get a rule-by-rule report in about 30 seconds.</p></div>
   <div class="grid">
     <form class="panel" id="screenForm" novalidate>
-      <h3>1. Your application</h3>
-      <div class="row"><button class="button quiet small" type="button" data-sample="strong">Use a strong example</button><button class="button quiet small" type="button" data-sample="weak">Use a weak example</button></div>
-      <label for="screenText">Application text <span class="hint">Summary, licence, budget breakdown, background&hellip; Plain text is fine.</span></label>
-      <textarea id="screenText" rows="11" maxlength="12000" spellcheck="true" placeholder="Paste the text of your proposal here" aria-describedby="screenStatus"></textarea>
-      <h3>2. Your requested budget</h3>
-      <label for="screenBudget">Total amount in euros <span class="hint">Whole euros, for example 24000.</span></label>
-      <div class="budget"><span aria-hidden="true">&euro;</span><input id="screenBudget" type="text" inputmode="numeric" autocomplete="off" placeholder="24000" aria-describedby="screenStatus"></div>
-      <p class="lock"><span aria-hidden="true">🔒</span><span><b>Stays on this device.</b> Only a proof that it is between &euro;5,000 and &euro;50,000 is shared. The AI never sees it.</span></p>
-      <button class="button primary" type="submit" id="screenRun">Check my application</button>
+      <div class="try"><span>No proposal handy? Try one:</span><button class="chip" type="button" data-sample="strong"><i aria-hidden="true">✓</i> Strong example</button><button class="chip" type="button" data-sample="weak"><i aria-hidden="true">!</i> Weak example</button></div>
+      <label for="screenText"><span class="lbl"><span class="step-n">1</span> Your application</span><span class="hint">Summary, licence, budget breakdown, background. Plain text is fine.</span></label>
+      <textarea id="screenText" rows="7" maxlength="12000" spellcheck="true" placeholder="Paste the text of your proposal here" aria-describedby="screenStatus"></textarea>
+      <label for="screenBudget"><span class="lbl"><span class="step-n">2</span> Your total budget</span><span class="hint">Whole euros. <b class="lock-inline">🔒 Stays on this device</b>: only a proof that it is between &euro;5,000 and &euro;50,000 is shared.</span></label>
+      <div class="submit-row"><div class="budget"><span aria-hidden="true">&euro;</span><input id="screenBudget" type="text" inputmode="numeric" autocomplete="off" placeholder="24000" aria-describedby="screenStatus"></div><button class="button primary go" type="submit" id="screenRun">Check my application</button></div>
       <output id="screenStatus" aria-live="polite"></output>
     </form>
     <div aria-live="polite">
-      <div class="placeholder" id="screenPlaceholder"><p><b>Your report will appear here.</b></p><p>Not sure what to paste? Select &ldquo;Use a strong example&rdquo; to see a complete run.</p></div>
+      <div class="placeholder" id="screenPlaceholder"><div class="ph-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><rect x="9" y="6" width="30" height="36" rx="5" stroke="currentColor" stroke-width="2.5"/><path d="M16 17h16M16 24h16M16 31h9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></div><p><b>Your report will appear here</b></p><p>Paste your proposal, or select <b>Strong example</b> to see a complete check in about 30 seconds.</p></div>
       <div id="screenResult" hidden></div>
     </div>
   </div>
@@ -182,7 +229,7 @@ details>div,details>pre{margin:0;padding:0 14px 14px}details pre{white-space:pre
       <button class="button primary" type="submit">Check all proofs</button><output id="auditStatus" aria-live="polite"></output>
       <p class="hint">The example round creates five real proofs for random budgets in range, then adds one altered proof and one copy, to show what gets caught. Example proofs are not sent to zkVerify.</p>
     </form>
-    <div aria-live="polite"><div class="placeholder" id="auditPlaceholder"><p><b>Results will appear here.</b></p><p>Select &ldquo;Create an example round&rdquo; to try it.</p></div><div id="auditResult" hidden></div></div>
+    <div aria-live="polite"><div class="placeholder" id="auditPlaceholder"><div class="ph-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><rect x="6" y="9" width="36" height="30" rx="5" stroke="currentColor" stroke-width="2.5"/><path d="M6 18h36M18 18v21" stroke="currentColor" stroke-width="2.5"/></svg></div><p><b>Results will appear here</b></p><p>Select <b>Create an example round</b> to try it.</p></div><div id="auditResult" hidden></div></div>
   </div>
 </section>
 
@@ -221,6 +268,11 @@ details>div,details>pre{margin:0;padding:0 14px 14px}details pre{white-space:pre
   }
   window.addEventListener("hashchange", show);
   show();
+  // Reveal sections as they scroll into view.
+  const io = "IntersectionObserver" in window ? new IntersectionObserver(entries => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  }, { threshold: 0.12 }) : null;
+  document.querySelectorAll(".reveal").forEach(el => io ? io.observe(el) : el.classList.add("in"));
 })();
 </script>
 <script src="/zk-receipt.js" defer></script>
